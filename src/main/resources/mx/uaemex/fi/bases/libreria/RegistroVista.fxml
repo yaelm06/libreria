@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="mx.uaemex.fi.bases.libreria.controlador.RegistroControlador"
+          alignment="CENTER" hgap="10" vgap="8" style="-fx-background-color: #f4f4f4;">
+
+    <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+
+    <Text text="Registro de Nuevo Empleado"
+          GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+        <font>
+            <Font name="Tahoma" size="20.0" />
+        </font>
+    </Text>
+
+    <Label text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <TextField fx:id="txtNombre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+    <Label text="Apellido Paterno:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+    <TextField fx:id="txtApellidoPaterno" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+    <Label text="Apellido Materno:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+    <TextField fx:id="txtApellidoMaterno" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+    <Label text="Cargo:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+    <TextField fx:id="txtCargo" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+    <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+    <TextField fx:id="txtEmail" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+    <Label text="Teléfono:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+    <TextField fx:id="txtTelefono" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+    <Label text="Calle:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+    <TextField fx:id="txtCalle" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+    <Label text="Número:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+    <TextField fx:id="txtNumeroCalle" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+    <Label text="Estado:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+    <HBox spacing="5" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="9">
+        <ComboBox fx:id="cmbEstado" promptText="Seleccione Estado..."
+                  maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="+" onAction="#agregarEstado"
+                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold;"
+                minWidth="30"/>
+    </HBox>
+
+    <Label text="Municipio:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+    <HBox spacing="5" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="10">
+        <ComboBox fx:id="cmbMunicipio" promptText="Seleccione Municipio..."
+                  maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="+" onAction="#agregarMunicipio"
+                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold;"
+                minWidth="30"/>
+    </HBox>
+
+    <Label text="Localidad:" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+    <HBox spacing="5" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="11">
+        <ComboBox fx:id="cmbLocalidad" promptText="Seleccione Localidad..."
+                  maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="+" onAction="#agregarLocalidad"
+                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold;"
+                minWidth="30"/>
+    </HBox>
+    <Label text="Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="12" />
+    <TextField fx:id="txtUsuario" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+
+    <Label text="Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="13" />
+    <PasswordField fx:id="txtContraseña" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+
+    <Button fx:id="btnVolverLogin" text="Volver al Login" onAction="#volverLogin"
+            GridPane.columnIndex="0" GridPane.rowIndex="14"
+            style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
+
+    <Button fx:id="btnRegistrar" text="Registrar Empleado" onAction="#registrar"
+            GridPane.columnIndex="1" GridPane.rowIndex="14"
+            style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+
+    <Label fx:id="lblMensaje" GridPane.columnIndex="0" GridPane.rowIndex="15" GridPane.columnSpan="2" />
+
+</GridPane>
