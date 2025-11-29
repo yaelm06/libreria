@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="mx.uaemex.fi.bases.libreria.controlador.UbicacionesControlador"
+      spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+
+    <Label text="Gestión de Ubicaciones">
+        <font><Font name="Segoe UI Bold" size="24.0"/></font>
+    </Label>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- ================= PESTAÑA 1: ESTADOS ================= -->
+        <Tab text="Estados">
+            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
+
+                <!-- SECCIÓN AGREGAR -->
+                <Label text="Agregar Nuevo Estado" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
+                    <Label text="Nombre:"/>
+                    <TextField fx:id="txtNombreEstadoAgregar" promptText="Ej. Sonora"/>
+                    <Button text="Agregar" onAction="#agregarEstado" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                </HBox>
+
+                <Separator/>
+
+                <!-- SECCIÓN TABLA Y BÚSQUEDA -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Buscar:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
+                    <TextField fx:id="txtBuscarEstado" promptText="Nombre..."/>
+                    <Button text="🔍" onAction="#buscarEstado"/>
+                    <Button text="Ver Todos" onAction="#cargarEstados"/>
+                    <Label fx:id="lblTotalEstados" text="Encontrados: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+                </HBox>
+
+                <TableView fx:id="tblEstados" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIdEstado" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colNombreEstado" text="Estado" prefWidth="300"/>
+                    </columns>
+                </TableView>
+
+                <!-- SECCIÓN EDITAR (Abajo) -->
+                <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
+                    <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Nombre:"/>
+                        <TextField fx:id="txtNombreEstadoEditar" promptText="Seleccione un estado..." HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnActualizarEstado" text="Actualizar" onAction="#actualizarEstado" disable="true" style="-fx-background-color: #f39c12; -fx-text-fill: white;"/>
+                        <Button fx:id="btnEliminarEstado" text="Eliminar" onAction="#eliminarEstado" disable="true" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                        <Button text="Limpiar Selección" onAction="#limpiarSeleccionEstado"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </Tab>
+
+        <!-- ================= PESTAÑA 2: MUNICIPIOS ================= -->
+        <Tab text="Municipios">
+            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
+
+                <!-- SECCIÓN AGREGAR -->
+                <Label text="Agregar Nuevo Municipio" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
+                    <Label text="Estado:"/>
+                    <ComboBox fx:id="cmbEstadoMuniAgregar" prefWidth="150" promptText="Selecciona..."/>
+                    <Label text="Nombre:"/>
+                    <TextField fx:id="txtNombreMuniAgregar" promptText="Ej. Hermosillo"/>
+                    <Button text="Agregar" onAction="#agregarMunicipio" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                </HBox>
+
+                <Separator/>
+
+                <!-- SECCIÓN TABLA -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Filtrar por:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
+                    <Label text="Estado:"/>
+                    <ComboBox fx:id="cmbBuscarEstadoMuni" promptText="Todos" prefWidth="150"/>
+                    <Label text="Nombre:"/>
+                    <TextField fx:id="txtBuscarMunicipio" promptText="Nombre..."/>
+                    <Button text="🔍" onAction="#buscarMunicipio"/>
+                    <Button text="Ver Todos" onAction="#cargarMunicipios"/>
+                    <Label fx:id="lblTotalMunicipios" text="Encontrados: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+                </HBox>
+
+                <TableView fx:id="tblMunicipios" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIdMunicipio" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colNombreMunicipio" text="Municipio" prefWidth="200"/>
+                        <TableColumn fx:id="colEstadoDeMunicipio" text="Estado" prefWidth="200"/>
+                    </columns>
+                </TableView>
+
+                <!-- SECCIÓN EDITAR -->
+                <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
+                    <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Estado:"/>
+                        <ComboBox fx:id="cmbEstadoMuniEditar" prefWidth="150"/>
+                        <Label text="Nombre:"/>
+                        <TextField fx:id="txtNombreMuniEditar" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnActualizarMunicipio" text="Actualizar" onAction="#actualizarMunicipio" disable="true" style="-fx-background-color: #f39c12; -fx-text-fill: white;"/>
+                        <Button fx:id="btnEliminarMunicipio" text="Eliminar" onAction="#eliminarMunicipio" disable="true" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                        <Button text="Cancelar" onAction="#limpiarSeleccionMunicipio"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </Tab>
+
+        <!-- ================= PESTAÑA 3: LOCALIDADES ================= -->
+        <Tab text="Localidades">
+            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
+
+                <!-- SECCIÓN AGREGAR -->
+                <Label text="Agregar Nueva Localidad" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                <HBox spacing="10" alignment="BOTTOM_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
+                    <VBox spacing="2">
+                        <Label text="Estado:"/>
+                        <ComboBox fx:id="cmbEstadoLocAgregar" prefWidth="150" promptText="Selecciona..."/>
+                    </VBox>
+                    <VBox spacing="2">
+                        <Label text="Municipio:"/>
+                        <ComboBox fx:id="cmbMuniLocAgregar" prefWidth="150" promptText="Luego este..."/>
+                    </VBox>
+                    <VBox spacing="2">
+                        <Label text="Localidad:"/>
+                        <TextField fx:id="txtNombreLocAgregar" promptText="Ej. Centro"/>
+                    </VBox>
+                    <VBox spacing="2">
+                        <Label text="CP:"/>
+                        <TextField fx:id="txtCPLocAgregar" prefWidth="70" promptText="83000"/>
+                    </VBox>
+                    <VBox spacing="2" alignment="BOTTOM_LEFT">
+                        <Button text="Agregar" onAction="#agregarLocalidad" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                    </VBox>
+                </HBox>
+
+                <Separator/>
+
+                <!-- SECCIÓN TABLA Y BÚSQUEDA -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Filtrar:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
+                    <VBox spacing="2">
+                        <Label text="Estado:" style="-fx-font-size: 10px;"/>
+                        <ComboBox fx:id="cmbBuscarEstadoLoc" promptText="Todos" prefWidth="120"/>
+                    </VBox>
+                    <VBox spacing="2">
+                        <Label text="Municipio:" style="-fx-font-size: 10px;"/>
+                        <ComboBox fx:id="cmbBuscarMunicipioLoc" promptText="Todos" prefWidth="120"/>
+                    </VBox>
+                    <VBox spacing="2">
+                        <Label text="Nombre:" style="-fx-font-size: 10px;"/>
+                        <TextField fx:id="txtBuscarLocalidad" promptText="..." prefWidth="100"/>
+                    </VBox>
+                    <VBox spacing="2" alignment="BOTTOM_LEFT">
+                        <Button text="🔍" onAction="#buscarLocalidad"/>
+                    </VBox>
+                    <VBox spacing="2" alignment="BOTTOM_LEFT">
+                        <Button text="Ver Todos" onAction="#cargarLocalidades"/>
+                    </VBox>
+
+                    <Label fx:id="lblTotalLocalidades" text="Encontrados: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9; -fx-padding: 15 0 0 10;"/>
+                </HBox>
+
+                <TableView fx:id="tblLocalidades" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIdLocalidad" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colNombreLocalidad" text="Localidad" prefWidth="200"/>
+                        <TableColumn fx:id="colCPLocalidad" text="CP" prefWidth="80"/>
+                        <TableColumn fx:id="colMunicipioDeLocalidad" text="Municipio" prefWidth="150"/>
+                        <TableColumn fx:id="colEstadoDeLocalidad" text="Estado" prefWidth="150"/>
+                    </columns>
+                </TableView>
+
+                <!-- SECCIÓN EDITAR -->
+                <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
+                    <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
+                    <HBox spacing="10" alignment="BOTTOM_LEFT">
+                        <VBox spacing="2">
+                            <Label text="Estado:"/>
+                            <ComboBox fx:id="cmbEstadoLocEditar" prefWidth="150"/>
+                        </VBox>
+                        <VBox spacing="2">
+                            <Label text="Municipio:"/>
+                            <ComboBox fx:id="cmbMuniLocEditar" prefWidth="150"/>
+                        </VBox>
+                        <VBox spacing="2">
+                            <Label text="Localidad:"/>
+                            <TextField fx:id="txtNombreLocEditar"/>
+                        </VBox>
+                        <VBox spacing="2">
+                            <Label text="CP:"/>
+                            <TextField fx:id="txtCPLocEditar" prefWidth="70"/>
+                        </VBox>
+                        <VBox spacing="2" alignment="BOTTOM_LEFT">
+                            <HBox spacing="5">
+                                <Button fx:id="btnActualizarLocalidad" text="Actualizar" onAction="#actualizarLocalidad" disable="true" style="-fx-background-color: #f39c12; -fx-text-fill: white;"/>
+                                <Button fx:id="btnEliminarLocalidad" text="Eliminar" onAction="#eliminarLocalidad" disable="true" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                                <Button text="Cancelar" onAction="#limpiarSeleccionLocalidad"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+
+    <Label fx:id="lblMensaje" textFill="blue"/>
+
+</VBox>

@@ -12,9 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-// Rutas de 'import' actualizadas a 'modelo'
 import mx.uaemex.fi.bases.libreria.modelo.ConexionBD;
-import mx.uaemex.fi.bases.libreria.modelo.EmpleadosDAO;
 import mx.uaemex.fi.bases.libreria.modelo.EmpleadosDAOPsqlImp;
 import mx.uaemex.fi.bases.libreria.modelo.data.Empleado;
 
@@ -24,12 +22,9 @@ import java.util.ArrayList;
 
 public class LoginControlador {
 
-    @FXML
-    private TextField txtUsuario;
-    @FXML
-    private PasswordField txtContraseña;
-    @FXML
-    private Label lblMensaje;
+    @FXML private TextField txtUsuario;
+    @FXML private PasswordField txtContraseña;
+    @FXML private Label lblMensaje;
 
     private ConexionBD con;
     private EmpleadosDAOPsqlImp empleadosDAO;
@@ -39,7 +34,6 @@ public class LoginControlador {
     }
 
     public LoginControlador() {
-        // La implementación del DAO ahora está en 'modelo'
         this.empleadosDAO = new EmpleadosDAOPsqlImp();
     }
 
@@ -52,7 +46,7 @@ public class LoginControlador {
         try {
             conn = con.obtenerConexion();
             if (conn == null) {
-                lblMensaje.setText("Error: No se pudo conectar a la BD.");
+                lblMensaje.setText("Error de conexión BD.");
                 lblMensaje.setTextFill(Color.RED);
                 return;
             }
@@ -65,45 +59,49 @@ public class LoginControlador {
 
             ArrayList<Empleado> resultado = empleadosDAO.consultar(empleadoConsulta);
 
-            if (resultado.size() == 1) {
-                lblMensaje.setText("¡Éxito! Bienvenido " + resultado.get(0).getNombre());
-                lblMensaje.setTextFill(Color.GREEN);
+            if (!resultado.isEmpty()) {
+                Empleado empLogueado = resultado.get(0);
+                if (Boolean.TRUE.equals(empLogueado.isActivo())) {
+                    lblMensaje.setText("¡Bienvenido " + empLogueado.getNombre() + "!");
+                    lblMensaje.setTextFill(Color.GREEN);
+                    abrirMenuPrincipal(event, empLogueado);
+                } else {
+                    lblMensaje.setText("Usuario inactivo.");
+                    lblMensaje.setTextFill(Color.RED);
+                }
             } else {
                 lblMensaje.setText("Usuario o contraseña incorrectos.");
                 lblMensaje.setTextFill(Color.RED);
             }
 
         } catch (Exception e) {
-            lblMensaje.setText("Error en la aplicación: " + e.getMessage());
-            lblMensaje.setTextFill(Color.RED);
+            lblMensaje.setText("Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            if(conn != null) {
-                con.cerrarRecursos(conn);
-            }
+            // No cerramos conexión aquí, se pasa al siguiente controlador
         }
     }
 
-    @FXML
-    void irARegistro(ActionEvent event) {
+    private void abrirMenuPrincipal(ActionEvent event, Empleado empleado) {
         try {
-            // Ruta de FXML actualizada a '/.../vista/...'
-
-            String fxmlPath = "/mx/uaemex/fi/bases/libreria/RegistroVista.fxml";
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uaemex/fi/bases/libreria/MenuPrincipalVista.fxml"));
             Parent root = loader.load();
 
-            RegistroControlador controller = loader.getController();
-            controller.setConexionBD(this.con);
+            MenuPrincipalControlador menuCtrl = loader.getController();
+            menuCtrl.initData(this.con, empleado);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
-            stage.setTitle("Registrar Nuevo Empleado");
+
+            // --- CAMBIO CLAVE: Título y Maximizar ---
+            stage.setTitle("Sistema Librería - Menú Principal");
             stage.setScene(scene);
+            stage.setMaximized(true); // Maximizar para ver todo bien
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
-            lblMensaje.setText("Error al cargar la vista de registro.");
+            lblMensaje.setText("Error al cargar menú principal: " + e.getMessage());
         }
     }
 }

@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.paint.Color?>
 
 <GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="mx.uaemex.fi.bases.libreria.controlador.LoginControlador"
@@ -16,14 +15,12 @@
 
     <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
 
-
-    <Text text="Bienvenido"
+    <Text text="Acceso al Sistema"
           GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
         <font>
             <Font name="Tahoma" size="20.0" />
         </font>
     </Text>
-
 
     <Label text="Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
     <TextField fx:id="txtUsuario" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -33,12 +30,9 @@
 
     <Button fx:id="btnLogin" text="Iniciar Sesión" onAction="#login"
             GridPane.columnIndex="1" GridPane.rowIndex="4"
+            maxWidth="Infinity"
             style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
 
-    <Button fx:id="btnIrARegistro" text="Registrar Empleado" onAction="#irARegistro"
-            GridPane.columnIndex="1" GridPane.rowIndex="5"
-            style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
-
-    <Label fx:id="lblMensaje" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+    <Label fx:id="lblMensaje" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2" />
 
 </GridPane>

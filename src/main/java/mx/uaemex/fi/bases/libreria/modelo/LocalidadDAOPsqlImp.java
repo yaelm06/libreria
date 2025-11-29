@@ -1,8 +1,8 @@
 package mx.uaemex.fi.bases.libreria.modelo;
 
 import mx.uaemex.fi.bases.libreria.modelo.data.Localidad;
-import mx.uaemex.fi.bases.libreria.modelo.data.Municipio;
 import mx.uaemex.fi.bases.libreria.modelo.data.Estado;
+import mx.uaemex.fi.bases.libreria.modelo.data.Municipio;
 import java.util.ArrayList;
 import java.sql.*;
 
@@ -10,13 +10,10 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
 
     @Override
     public Localidad insertar(Localidad l) {
-        System.out.println("--- [LocalidadDAO] Insertar ---");
-        PreparedStatement pstmt = null;
-        ArrayList<Localidad> consultados;
-        // INSERTAMOS EN LA TABLA FÍSICA, NO EN LA VISTA
         String sql = "INSERT INTO ubicaciones.tlocalidad (localidad, codigo_postal, id_municipio) VALUES (?, ?, ?)";
-
+        PreparedStatement pstmt = null;
         try {
+            System.out.println("Ejecutando SQL (Localidad Insert): " + sql);
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setString(1, l.getLocalidad());
             pstmt.setString(2, l.getCodigoPostal());
@@ -24,78 +21,72 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
             if (l.getMunicipio() != null && l.getMunicipio().getId() > 0) {
                 pstmt.setInt(3, l.getMunicipio().getId());
             } else {
-                throw new RuntimeException("Se requiere un Objeto Municipio con ID para insertar Localidad");
+                throw new RuntimeException("Se requiere un municipio válido.");
             }
 
             pstmt.executeUpdate();
-            System.out.println("Localidad insertada correctamente en tlocalidad.");
-
+            return l;
         } catch (SQLException ex) {
-            throw new RuntimeException("Error al insertar localidad: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error insertando localidad: " + ex.getMessage(), ex);
         } finally {
-            try { if (pstmt != null) pstmt.close(); } catch (SQLException ex) { }
+            cerrar(pstmt);
         }
-
-        consultados = this.consultar(l);
-        return !consultados.isEmpty() ? consultados.get(0) : null;
     }
 
     @Override
     public ArrayList<Localidad> consultar() {
-        return this.consultar(new Localidad());
+        // Consultar TODAS (sin filtros)
+        return consultar(new Localidad());
     }
 
     @Override
     public ArrayList<Localidad> consultar(Localidad l) {
-        ArrayList<Localidad> encontrados = new ArrayList<>();
-        StringBuilder sql;
-        int numColumnas = 0;
+        ArrayList<Localidad> lista = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM ubicaciones.vista_localidades_completas");
+        int cols = 0;
+
+        // --- Construcción de Filtros ---
+
+        // 1. Filtro por ID
+        if (l.getId() > 0) {
+            sql.append(" WHERE id_localidad=").append(l.getId());
+            cols++;
+        }
+
+        // 2. Filtro por Nombre Localidad (si escribieron algo)
+        if (l.getLocalidad() != null && !l.getLocalidad().isEmpty()) {
+            if (cols > 0) sql.append(" AND localidad LIKE '%").append(l.getLocalidad()).append("%'");
+            else sql.append(" WHERE localidad LIKE '%").append(l.getLocalidad()).append("%'");
+            cols++;
+        }
+
+        // 3. Filtro por CP
+        if (l.getCodigoPostal() != null && !l.getCodigoPostal().isEmpty()) {
+            if (cols > 0) sql.append(" AND codigo_postal LIKE '%").append(l.getCodigoPostal()).append("%'");
+            else sql.append(" WHERE codigo_postal LIKE '%").append(l.getCodigoPostal()).append("%'");
+            cols++;
+        }
+
+        // 4. Filtro por Municipio (usando el nombre que viene en la vista)
+        if (l.getMunicipio() != null && l.getMunicipio().getNombre() != null && !l.getMunicipio().getNombre().isEmpty()) {
+            if (cols > 0) sql.append(" AND municipio='").append(l.getMunicipio().getNombre()).append("'");
+            else sql.append(" WHERE municipio='").append(l.getMunicipio().getNombre()).append("'");
+            cols++;
+        }
+
+        // 5. Filtro por Estado (usando el nombre que viene en la vista)
+        // Este era el que fallaba antes si no ponías nombre de localidad. Ahora debería funcionar.
+        if (l.getEstado() != null && l.getEstado().getNombre() != null && !l.getEstado().getNombre().isEmpty()) {
+            if (cols > 0) sql.append(" AND estado='").append(l.getEstado().getNombre()).append("'");
+            else sql.append(" WHERE estado='").append(l.getEstado().getNombre()).append("'");
+            cols++;
+        }
+
         Statement stmt = null;
         ResultSet rs = null;
-
         try {
+            System.out.println("Ejecutando SQL (Localidad Consultar): " + sql);
             stmt = this.conexion.createStatement();
-
-            // --- IMPORTANTE: Consultamos a la VISTA para poder filtrar por estado/municipio ---
-            sql = new StringBuilder("SELECT * FROM ubicaciones.vista_localidades_completas");
-
-            // 1. ID Localidad
-            if (l.getId() > 0) {
-                sql.append(" WHERE (id_localidad=").append(l.getId());
-                numColumnas++;
-            }
-
-            // 2. Localidad (Nombre)
-            if (l.getLocalidad() != null) {
-                if (numColumnas != 0) sql.append(" AND localidad='").append(l.getLocalidad()).append("'");
-                else sql.append(" WHERE (localidad='").append(l.getLocalidad()).append("'");
-                numColumnas++;
-            }
-
-            // 3. Código Postal
-            if (l.getCodigoPostal() != null) {
-                if (numColumnas != 0) sql.append(" AND codigo_postal='").append(l.getCodigoPostal()).append("'");
-                else sql.append(" WHERE (codigo_postal='").append(l.getCodigoPostal()).append("'");
-                numColumnas++;
-            }
-
-            // 4. ID Municipio (Filtro de Cascada Nivel 2)
-            if (l.getMunicipio() != null && l.getMunicipio().getId() > 0) {
-                if (numColumnas != 0) sql.append(" AND id_municipio=").append(l.getMunicipio().getId());
-                else sql.append(" WHERE (id_municipio=").append(l.getMunicipio().getId());
-                numColumnas++;
-            }
-
-            // 5. ID Estado (Filtro de Cascada Nivel 1 - Gracias a la VISTA)
-            if (l.getEstado() != null && l.getEstado().getId() > 0) {
-                if (numColumnas != 0) sql.append(" AND id_estado=").append(l.getEstado().getId());
-                else sql.append(" WHERE (id_estado=").append(l.getEstado().getId());
-                numColumnas++;
-            }
-
-            if (numColumnas != 0) sql.append(")");
-
-            // System.out.println("[LocalidadDAO] QBE en Vista: " + sql.toString());
             rs = stmt.executeQuery(sql.toString());
 
             while (rs.next()) {
@@ -104,81 +95,61 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
                 loc.setLocalidad(rs.getString("localidad"));
                 loc.setCodigoPostal(rs.getString("codigo_postal"));
 
-                // Mapeamos el Municipio completo desde la vista
+                // Llenamos el objeto Municipio
                 Municipio mun = new Municipio();
-                mun.setId(rs.getInt("id_municipio"));
-                mun.setNombre(rs.getString("municipio")); // Nombre viene de la vista
+                mun.setNombre(rs.getString("municipio"));
                 loc.setMunicipio(mun);
 
-                // Mapeamos el Estado completo desde la vista
+                // Llenamos el objeto Estado
                 Estado est = new Estado();
-                est.setId(rs.getInt("id_estado"));
-                est.setNombre(rs.getString("estado")); // Nombre viene de la vista
+                est.setNombre(rs.getString("estado"));
                 loc.setEstado(est);
 
-                encontrados.add(loc);
+                lista.add(loc);
             }
-            return encontrados;
-
+            return lista;
         } catch (SQLException ex) {
-            throw new RuntimeException("Error consultar vista localidad: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error consultando localidades: " + ex.getMessage(), ex);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException ex) { }
+            cerrar(stmt, rs);
         }
     }
 
     @Override
     public void actualizar(Localidad l) {
-        // ACTUALIZAMOS LA TABLA FÍSICA
-        StringBuilder sql = new StringBuilder("UPDATE ubicaciones.tlocalidad SET");
-        int numColumnas = 0;
-        Statement stmt = null;
-
+        String sql = "UPDATE ubicaciones.tlocalidad SET localidad=?, codigo_postal=?, id_municipio=? WHERE id_localidad=?";
+        PreparedStatement pstmt = null;
         try {
-            stmt = this.conexion.createStatement();
-
-            if (l.getLocalidad() != null) {
-                sql.append(" localidad='").append(l.getLocalidad()).append("'");
-                numColumnas++;
-            }
-            if (l.getCodigoPostal() != null) {
-                if (numColumnas > 0) sql.append(",");
-                sql.append(" codigo_postal='").append(l.getCodigoPostal()).append("'");
-                numColumnas++;
-            }
-            if (l.getMunicipio() != null && l.getMunicipio().getId() > 0) {
-                if (numColumnas > 0) sql.append(",");
-                sql.append(" id_municipio=").append(l.getMunicipio().getId());
-                numColumnas++;
-            }
-
-            if (l.getId() > 0) {
-                sql.append(" WHERE id_localidad=").append(l.getId());
-            } else {
-                throw new RuntimeException("ID requerido para actualizar Localidad");
-            }
-
-            if (numColumnas > 0) stmt.executeUpdate(sql.toString());
-
+            System.out.println("Ejecutando SQL (Localidad Update): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
+            pstmt.setString(1, l.getLocalidad());
+            pstmt.setString(2, l.getCodigoPostal());
+            pstmt.setInt(3, l.getMunicipio().getId());
+            pstmt.setInt(4, l.getId());
+            pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error actualizar localidad: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error actualizando localidad: " + ex.getMessage(), ex);
         } finally {
-            try { if (stmt != null) stmt.close(); } catch (Exception ex) { }
+            cerrar(pstmt);
         }
     }
 
     @Override
     public void borrar(Localidad l) {
-        // BORRAMOS DE LA TABLA FÍSICA
-        String sql = "DELETE FROM ubicaciones.tlocalidad WHERE id_localidad = ?";
-        try (PreparedStatement pstmt = this.conexion.prepareStatement(sql)) {
+        String sql = "DELETE FROM ubicaciones.tlocalidad WHERE id_localidad=?";
+        PreparedStatement pstmt = null;
+        try {
+            System.out.println("Ejecutando SQL (Localidad Delete): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
             pstmt.setInt(1, l.getId());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error borrar localidad: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error borrando localidad: " + ex.getMessage(), ex);
+        } finally {
+            cerrar(pstmt);
         }
     }
+
+    private void cerrar(Statement s) { try { if(s!=null) s.close(); } catch(Exception e){} }
+    private void cerrar(Statement s, ResultSet r) { try { if(r!=null) r.close(); if(s!=null) s.close(); } catch(Exception e){} }
 }

@@ -8,113 +8,94 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
 
     @Override
     public Estado insertar(Estado e) {
-        System.out.println("--- [EstadoDAO] Insertar ---");
-        PreparedStatement pstmt = null;
-        ArrayList<Estado> consultados;
         String sql = "INSERT INTO ubicaciones.testado (estado) VALUES (?)";
-
+        PreparedStatement pstmt = null;
         try {
+            System.out.println("Ejecutando SQL (Estado Insert): " + sql);
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setString(1, e.getNombre());
             pstmt.executeUpdate();
-            System.out.println("Estado insertado correctamente.");
-
+            return e;
         } catch (SQLException ex) {
             throw new RuntimeException("Error al insertar estado: " + ex.getMessage(), ex);
         } finally {
-            try {
-                if (pstmt != null) { pstmt.close(); System.out.println("Conexión Cerrada : PreparedStatement"); }
-            } catch (SQLException ex) { System.out.println("Error cerrar: " + ex); }
+            cerrar(pstmt);
         }
-
-        consultados = this.consultar(e);
-        return !consultados.isEmpty() ? consultados.get(0) : null;
     }
 
     @Override
     public ArrayList<Estado> consultar() {
-        return this.consultar(new Estado());
+        return consultar(new Estado());
     }
 
     @Override
-    public ArrayList<Estado> consultar(Estado estado) {
-        ArrayList<Estado> encontrados = new ArrayList<>();
+    public ArrayList<Estado> consultar(Estado e) {
+        ArrayList<Estado> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM ubicaciones.testado");
-        int numColumnas = 0;
+        int cols = 0;
+
+        if (e.getId() > 0) {
+            sql.append(" WHERE id_estado=").append(e.getId());
+            cols++;
+        }
+        if (e.getNombre() != null) {
+            if (cols > 0) sql.append(" AND estado='").append(e.getNombre()).append("'");
+            else sql.append(" WHERE estado='").append(e.getNombre()).append("'");
+        }
+
         Statement stmt = null;
         ResultSet rs = null;
-
         try {
+            System.out.println("Ejecutando SQL (Estado Consultar): " + sql);
             stmt = this.conexion.createStatement();
-
-            if (estado.getId() > 0) {
-                sql.append(" WHERE (id_estado=").append(estado.getId());
-                numColumnas++;
-            }
-            if (estado.getNombre() != null) {
-                if (numColumnas != 0) sql.append(" AND estado='").append(estado.getNombre()).append("'");
-                else sql.append(" WHERE (estado='").append(estado.getNombre()).append("'");
-                numColumnas++;
-            }
-            if (numColumnas != 0) sql.append(")");
-
-            // System.out.println("[EstadoDAO] SQL: " + sql.toString());
             rs = stmt.executeQuery(sql.toString());
-
             while (rs.next()) {
-                Estado est = new Estado();
-                est.setId(rs.getInt("id_estado"));
-                est.setNombre(rs.getString("estado"));
-                encontrados.add(est);
+                Estado estado = new Estado();
+                estado.setId(rs.getInt("id_estado"));
+                estado.setNombre(rs.getString("estado"));
+                lista.add(estado);
             }
-            return encontrados;
-
+            return lista;
         } catch (SQLException ex) {
-            throw new RuntimeException("Error consulta estados: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error consultando estados: " + ex.getMessage(), ex);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException ex) { }
+            cerrar(stmt, rs);
         }
     }
 
     @Override
     public void actualizar(Estado e) {
-        StringBuilder sql = new StringBuilder("UPDATE ubicaciones.testado SET");
-        int numColumnas = 0;
-        Statement stmt = null;
-
+        String sql = "UPDATE ubicaciones.testado SET estado=? WHERE id_estado=?";
+        PreparedStatement pstmt = null;
         try {
-            stmt = this.conexion.createStatement();
-            if (e.getNombre() != null) {
-                sql.append(" estado='").append(e.getNombre()).append("'");
-                numColumnas++;
-            }
-
-            if (e.getId() > 0) {
-                sql.append(" WHERE id_estado=").append(e.getId());
-            } else {
-                throw new RuntimeException("ID requerido para actualizar Estado");
-            }
-
-            if (numColumnas > 0) stmt.executeUpdate(sql.toString());
-
+            System.out.println("Ejecutando SQL (Estado Update): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
+            pstmt.setString(1, e.getNombre());
+            pstmt.setInt(2, e.getId());
+            pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error actualizar estado: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error actualizando estado: " + ex.getMessage(), ex);
         } finally {
-            try { if (stmt != null) stmt.close(); } catch (Exception ex) { }
+            cerrar(pstmt);
         }
     }
 
     @Override
     public void borrar(Estado e) {
-        String sql = "DELETE FROM ubicaciones.testado WHERE id_estado = ?";
-        try (PreparedStatement pstmt = this.conexion.prepareStatement(sql)) {
+        String sql = "DELETE FROM ubicaciones.testado WHERE id_estado=?";
+        PreparedStatement pstmt = null;
+        try {
+            System.out.println("Ejecutando SQL (Estado Delete): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
             pstmt.setInt(1, e.getId());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error borrar estado: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error borrando estado: " + ex.getMessage(), ex);
+        } finally {
+            cerrar(pstmt);
         }
     }
+
+    private void cerrar(Statement s) { try { if(s!=null) s.close(); } catch(Exception e){} }
+    private void cerrar(Statement s, ResultSet r) { try { if(r!=null) r.close(); if(s!=null) s.close(); } catch(Exception e){} }
 }

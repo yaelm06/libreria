@@ -1,7 +1,7 @@
 package mx.uaemex.fi.bases.libreria.modelo;
 
-import mx.uaemex.fi.bases.libreria.modelo.data.Municipio;
 import mx.uaemex.fi.bases.libreria.modelo.data.Estado;
+import mx.uaemex.fi.bases.libreria.modelo.data.Municipio;
 import java.util.ArrayList;
 import java.sql.*;
 
@@ -9,71 +9,65 @@ public class MunicipioDAOPsqlImp extends AbstractSqlDAO implements MunicipioDAO 
 
     @Override
     public Municipio insertar(Municipio m) {
-        System.out.println("--- [MunicipioDAO] Insertar ---");
-        PreparedStatement pstmt = null;
-        ArrayList<Municipio> consultados;
+        // INSERT sigue siendo en la tabla física 'tmunicipio'
         String sql = "INSERT INTO ubicaciones.tmunicipio (municipio, id_estado) VALUES (?, ?)";
-
+        PreparedStatement pstmt = null;
         try {
+            System.out.println("Ejecutando SQL (Municipio Insert): " + sql);
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setString(1, m.getNombre());
-            // Validamos que venga el estado
-            if (m.getEstado() != null && m.getEstado().getId() > 0) {
-                pstmt.setInt(2, m.getEstado().getId());
-            } else {
-                throw new RuntimeException("Se requiere un Objeto Estado con ID para insertar Municipio");
-            }
+
+            // Usamos el ID del estado
+            pstmt.setInt(2, m.getEstado().getId());
 
             pstmt.executeUpdate();
-            System.out.println("Municipio insertado correctamente.");
-
+            return m;
         } catch (SQLException ex) {
             throw new RuntimeException("Error al insertar municipio: " + ex.getMessage(), ex);
         } finally {
-            try { if (pstmt != null) pstmt.close(); } catch (SQLException ex) { }
+            cerrar(pstmt);
         }
-
-        consultados = this.consultar(m);
-        return !consultados.isEmpty() ? consultados.get(0) : null;
     }
 
     @Override
     public ArrayList<Municipio> consultar() {
-        return this.consultar(new Municipio());
+        return consultar(new Municipio());
     }
 
     @Override
     public ArrayList<Municipio> consultar(Municipio m) {
-        ArrayList<Municipio> encontrados = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM ubicaciones.tmunicipio");
-        int numColumnas = 0;
+        ArrayList<Municipio> lista = new ArrayList<>();
+
+        // Usamos la VISTA en lugar del JOIN manual
+        StringBuilder sql = new StringBuilder("SELECT * FROM ubicaciones.vista_municipios_completos");
+        int cols = 0;
+
+        // Filtro por ID Municipio
+        if (m.getId() > 0) {
+            sql.append(" WHERE id_municipio=").append(m.getId());
+            cols++;
+        }
+
+        // Filtro por Nombre Municipio
+        if (m.getNombre() != null && !m.getNombre().isEmpty()) {
+            if (cols > 0) sql.append(" AND municipio LIKE '%").append(m.getNombre()).append("%'");
+            else sql.append(" WHERE municipio LIKE '%").append(m.getNombre()).append("%'");
+            cols++;
+        }
+
+        // Filtro por ID Estado
+        if (m.getEstado() != null && m.getEstado().getId() > 0) {
+            int idEst = m.getEstado().getId();
+            if (cols > 0) sql.append(" AND id_estado=").append(idEst);
+            else sql.append(" WHERE id_estado=").append(idEst);
+            cols++;
+        }
+
         Statement stmt = null;
         ResultSet rs = null;
-
         try {
+            System.out.println("Ejecutando SQL (Municipio Vista): " + sql);
             stmt = this.conexion.createStatement();
-
-            // 1. ID Municipio
-            if (m.getId() > 0) {
-                sql.append(" WHERE (id_municipio=").append(m.getId());
-                numColumnas++;
-            }
-            // 2. Nombre Municipio
-            if (m.getNombre() != null) {
-                if (numColumnas != 0) sql.append(" AND municipio='").append(m.getNombre()).append("'");
-                else sql.append(" WHERE (municipio='").append(m.getNombre()).append("'");
-                numColumnas++;
-            }
-            // 3. ID Estado (Relación)
-            if (m.getEstado() != null && m.getEstado().getId() > 0) {
-                if (numColumnas != 0) sql.append(" AND id_estado=").append(m.getEstado().getId());
-                else sql.append(" WHERE (id_estado=").append(m.getEstado().getId());
-                numColumnas++;
-            }
-
-            if (numColumnas != 0) sql.append(")");
-
-            // System.out.println("[MunicipioDAO] SQL: " + sql.toString());
             rs = stmt.executeQuery(sql.toString());
 
             while (rs.next()) {
@@ -81,67 +75,62 @@ public class MunicipioDAOPsqlImp extends AbstractSqlDAO implements MunicipioDAO 
                 mun.setId(rs.getInt("id_municipio"));
                 mun.setNombre(rs.getString("municipio"));
 
-                // Recuperamos el ID del estado y creamos el objeto
+                // --- CORRECCIÓN AQUÍ: Usando setEstado(Estado e) ---
+
+                // 1. Creamos el objeto Estado
                 Estado est = new Estado();
                 est.setId(rs.getInt("id_estado"));
+                est.setNombre(rs.getString("estado")); // La vista trae el nombre
+
+                // 2. Usamos setEstado pasando el objeto completo
                 mun.setEstado(est);
 
-                encontrados.add(mun);
+                lista.add(mun);
             }
-            return encontrados;
-
+            return lista;
         } catch (SQLException ex) {
-            throw new RuntimeException("Error consultar municipios: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error consultando vista municipios: " + ex.getMessage(), ex);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException ex) { }
+            cerrar(stmt, rs);
         }
     }
 
     @Override
     public void actualizar(Municipio m) {
-        StringBuilder sql = new StringBuilder("UPDATE ubicaciones.tmunicipio SET");
-        int numColumnas = 0;
-        Statement stmt = null;
-
+        // UPDATE sigue siendo en la tabla física
+        String sql = "UPDATE ubicaciones.tmunicipio SET municipio=?, id_estado=? WHERE id_municipio=?";
+        PreparedStatement pstmt = null;
         try {
-            stmt = this.conexion.createStatement();
-
-            if (m.getNombre() != null) {
-                sql.append(" municipio='").append(m.getNombre()).append("'");
-                numColumnas++;
-            }
-            if (m.getEstado() != null && m.getEstado().getId() > 0) {
-                if (numColumnas > 0) sql.append(",");
-                sql.append(" id_estado=").append(m.getEstado().getId());
-                numColumnas++;
-            }
-
-            if (m.getId() > 0) {
-                sql.append(" WHERE id_municipio=").append(m.getId());
-            } else {
-                throw new RuntimeException("ID requerido para actualizar Municipio");
-            }
-
-            if (numColumnas > 0) stmt.executeUpdate(sql.toString());
-
+            System.out.println("Ejecutando SQL (Municipio Update): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
+            pstmt.setString(1, m.getNombre());
+            pstmt.setInt(2, m.getEstado().getId());
+            pstmt.setInt(3, m.getId());
+            pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error actualizar municipio: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error actualizando municipio: " + ex.getMessage(), ex);
         } finally {
-            try { if (stmt != null) stmt.close(); } catch (Exception ex) { }
+            cerrar(pstmt);
         }
     }
 
     @Override
     public void borrar(Municipio m) {
-        String sql = "DELETE FROM ubicaciones.tmunicipio WHERE id_municipio = ?";
-        try (PreparedStatement pstmt = this.conexion.prepareStatement(sql)) {
+        // DELETE sigue siendo en la tabla física
+        String sql = "DELETE FROM ubicaciones.tmunicipio WHERE id_municipio=?";
+        PreparedStatement pstmt = null;
+        try {
+            System.out.println("Ejecutando SQL (Municipio Delete): " + sql);
+            pstmt = this.conexion.prepareStatement(sql);
             pstmt.setInt(1, m.getId());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Error borrar municipio: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error borrando municipio: " + ex.getMessage(), ex);
+        } finally {
+            cerrar(pstmt);
         }
     }
+
+    private void cerrar(Statement s) { try { if(s!=null) s.close(); } catch(Exception e){} }
+    private void cerrar(Statement s, ResultSet r) { try { if(r!=null) r.close(); if(s!=null) s.close(); } catch(Exception e){} }
 }
