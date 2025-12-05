@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -16,134 +18,189 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="mx.uaemex.fi.bases.libreria.controlador.EmpleadosControlador"
-      spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+<VBox style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.bases.libreria.controlador.EmpleadosControlador">
 
-    <Label text="Gestión de Empleados">
-        <font><Font name="Segoe UI Bold" size="24.0"/></font>
-    </Label>
+    <!-- BARRA SUPERIOR -->
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+        <Button onAction="#regresarMenu" style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;" text="⬅ Regresar al Menú" />
+        <Separator orientation="VERTICAL" />
+        <Label style="-fx-text-fill: #2c3e50;" text="Gestión de Empleados">
+            <font><Font name="Segoe UI Bold" size="18.0" /></font>
+        </Label>
+    </HBox>
 
-    <!-- ================= SECCIÓN 1: AGREGAR (Arriba) ================= -->
-    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <Label text="Registrar Nuevo Empleado" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
-            <!-- Botón de atajo para ir a Ubicaciones sin salir -->
-            <Button text="➕ Gestionar Ubicaciones" onAction="#abrirGestionUbicaciones" style="-fx-font-size: 10px; -fx-background-color: #34495e; -fx-text-fill: white; cursor: hand;"/>
-            <Button text="🔄 Recargar Listas" onAction="#recargarListasUbicacion" style="-fx-font-size: 10px;"/>
-        </HBox>
+    <!-- CONTENIDO PRINCIPAL (SPLIT) -->
+    <SplitPane dividerPositions="0.6" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
 
-        <GridPane hgap="10" vgap="10">
-            <columnConstraints>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-            </columnConstraints>
+        <!-- ================= IZQUIERDA: LISTA Y FILTROS ================= -->
+        <VBox spacing="10" style="-fx-padding: 15;">
 
-            <!-- Fila 1: Personales -->
-            <TextField fx:id="txtNombreAdd" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <TextField fx:id="txtPaternoAdd" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-            <TextField fx:id="txtMaternoAdd" promptText="A. Materno" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-            <ComboBox fx:id="cmbCargoAdd" promptText="Cargo" maxWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+            <!-- Panel de Búsqueda Avanzada (TODOS LOS CAMPOS) -->
+            <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1); -fx-spacing: 8;">
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="🔍 Búsqueda Avanzada (Todos los Campos)" />
 
-            <!-- Fila 2: Contacto -->
-            <TextField fx:id="txtTelefonoAdd" promptText="Teléfono" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtEmailAdd" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtCalleAdd" promptText="Calle" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtNumeroAdd" promptText="Número" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                <GridPane hgap="8" vgap="8">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                    </columnConstraints>
 
-            <!-- Fila 3: Ubicación (Cascada) -->
-            <ComboBox fx:id="cmbEstadoAdd" promptText="1. Estado" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="cmbMuniAdd" promptText="2. Municipio" maxWidth="Infinity" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="cmbLocalidadAdd" promptText="3. Localidad" maxWidth="Infinity" disable="true" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                    <!-- Fila 1: Identidad -->
+                    <TextField fx:id="txtBuscarNombre" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtBuscarPaterno" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtBuscarMaterno" promptText="A. Materno" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="cmbBuscarCargo" maxWidth="Infinity" promptText="Cargo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-            <!-- Login -->
-            <VBox spacing="5" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                <TextField fx:id="txtUsuarioAdd" promptText="Usuario Login"/>
-                <PasswordField fx:id="txtContraAdd" promptText="Contraseña"/>
+                    <!-- Fila 2: Cuenta y Contacto -->
+                    <TextField fx:id="txtBuscarUsuario" promptText="Usuario" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtBuscarEmail" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtBuscarTelefono" promptText="Teléfono" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <ComboBox fx:id="cmbBuscarEstatus" maxWidth="Infinity" promptText="Estatus" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                    <!-- Fila 3: Dirección -->
+                    <TextField fx:id="txtBuscarCalle" promptText="Calle" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <TextField fx:id="txtBuscarNumero" promptText="Num." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <!-- Filtros de Ubicación en Cascada -->
+                    <ComboBox fx:id="cmbBuscarEstado" maxWidth="Infinity" promptText="Estado" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="cmbBuscarMuni" maxWidth="Infinity" promptText="Municipio" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <ComboBox fx:id="cmbBuscarLocalidad" prefWidth="200" promptText="Localidad" />
+                    <Button onAction="#cargarEmpleados" style="-fx-background-color: #ecf0f1; -fx-text-fill: #7f8c8d;" text="Limpiar Filtros" />
+                    <Button onAction="#buscarEmpleado" prefWidth="100" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="Buscar" />
+                </HBox>
             </VBox>
-        </GridPane>
 
-        <HBox alignment="CENTER_RIGHT">
-            <Button text="Guardar Empleado" onAction="#agregarEmpleado" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
-        </HBox>
-    </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="lblTotal" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12; -fx-font-weight: bold;" text="Registros: 0" textFill="#2000f2" />
+                <VBox HBox.hgrow="ALWAYS" />
+                <Button onAction="#nuevoEmpleado" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="➕ Nuevo Empleado" />
+            </HBox>
 
-    <Separator/>
+            <!-- Tabla Completa (Con Scroll Horizontal Automático activado por columnas anchas) -->
+            <TableView fx:id="tblEmpleados" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="40" text="ID" />
+                    <TableColumn fx:id="colNombre" prefWidth="100" text="Nombre" />
+                    <TableColumn fx:id="colPaterno" prefWidth="100" text="A. Paterno" />
+                    <TableColumn fx:id="colMaterno" prefWidth="100" text="A. Materno" />
+                    <TableColumn fx:id="colCargo" prefWidth="90" text="Cargo" />
+                    <TableColumn fx:id="colUsuario" prefWidth="80" text="Usuario" />
+                    <TableColumn fx:id="colEmail" prefWidth="150" text="Email" />
+                    <TableColumn fx:id="colTelefono" prefWidth="90" text="Teléfono" />
+                    <TableColumn fx:id="colCalle" prefWidth="100" text="Calle" />
+                    <TableColumn fx:id="colNumero" prefWidth="50" text="Num" />
+                    <TableColumn fx:id="colLocalidadInfo" prefWidth="250" text="Ubicación (Loc, Mun, Est)" />
+                    <TableColumn fx:id="colActivo" prefWidth="60" text="Activo" />
+                </columns>
+                <!-- UNCONSTRAINED permite que aparezca el scroll horizontal si las columnas no caben -->
+                <columnResizePolicy>
+                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
 
-    <!-- ================= SECCIÓN 2: TABLA Y BÚSQUEDA (Centro) ================= -->
-    <VBox spacing="5" VBox.vgrow="ALWAYS">
-        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 8; -fx-background-radius: 5;">
-            <Label text="Filtrar por:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
-            <ComboBox fx:id="cmbBuscarEstado" promptText="Estado" prefWidth="120"/>
-            <TextField fx:id="txtBuscarNombre" promptText="Nombre..." prefWidth="120"/>
-            <TextField fx:id="txtBuscarUsuario" promptText="Usuario..." prefWidth="100"/>
-            <Button text="🔍 Buscar" onAction="#buscarEmpleado"/>
-            <Button text="Ver Todos" onAction="#cargarEmpleados"/>
-            <Label fx:id="lblTotal" text="Encontrados: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9; -fx-padding: 0 0 0 20;"/>
-        </HBox>
+        <!-- ================= DERECHA: FORMULARIO ================= -->
+        <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
 
-        <TableView fx:id="tblEmpleados" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn fx:id="colId" text="ID" prefWidth="40"/>
-                <TableColumn fx:id="colNombre" text="Nombre" prefWidth="120"/>
-                <TableColumn fx:id="colApellido" text="Apellidos" prefWidth="150"/>
-                <TableColumn fx:id="colCargo" text="Cargo" prefWidth="100"/>
-                <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="100"/>
-                <TableColumn fx:id="colEmail" text="Email" prefWidth="150"/>
-                <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="100"/>
-                <TableColumn fx:id="colLocalidadInfo" text="Ubicación" prefWidth="200"/>
-                <TableColumn fx:id="colActivo" text="Activo" prefWidth="60"/>
-            </columns>
-        </TableView>
-    </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #2c3e50;" text="Detalles" />
+                <Label fx:id="lblModo" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" text="(Nuevo)" />
+            </HBox>
 
-    <!-- ================= SECCIÓN 3: EDITAR (Abajo) ================= -->
-    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #fef9e7; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
-        <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
+            <Separator />
 
-        <GridPane hgap="10" vgap="10">
-            <columnConstraints>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-                <ColumnConstraints percentWidth="25"/>
-            </columnConstraints>
+            <VBox spacing="12">
+                <!-- Datos Personales -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Información Personal" />
+                <GridPane hgap="10" vgap="10">
+                    <TextField fx:id="txtNombre" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="txtPaterno" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="txtMaterno" promptText="A. Materno" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <ComboBox fx:id="cmbCargo" maxWidth="Infinity" promptText="Cargo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
 
-            <!-- Fila 1 -->
-            <TextField fx:id="txtNombreEdit" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <TextField fx:id="txtPaternoEdit" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-            <TextField fx:id="txtMaternoEdit" promptText="A. Materno" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-            <ComboBox fx:id="cmbCargoEdit" promptText="Cargo" maxWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <!-- Contacto -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Contacto y Dirección" />
+                <GridPane hgap="10" vgap="10">
+                    <TextField fx:id="txtTelefono" promptText="Teléfono" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtEmail" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="txtCalle" promptText="Calle" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtNumero" promptText="Num." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
 
-            <!-- Fila 2 -->
-            <TextField fx:id="txtTelefonoEdit" promptText="Teléfono" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtEmailEdit" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtCalleEdit" promptText="Calle" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtNumeroEdit" promptText="Número" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                <!-- Ubicación -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Ubicación Geográfica" />
+                    <Button onAction="#abrirGestionUbicaciones" style="-fx-font-size: 10px; -fx-background-color: #ecf0f1; -fx-cursor: hand;" text="Gestionar..." />
+                    <Button onAction="#recargarListasUbicacion" style="-fx-font-size: 10px;" text="⟳">
+                        <tooltip><javafx.scene.control.Tooltip text="Recargar listas" /></tooltip>
+                    </Button>
+                </HBox>
 
-            <!-- Fila 3: Ubicación (Cascada) -->
-            <ComboBox fx:id="cmbEstadoEdit" promptText="1. Estado" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="cmbMuniEdit" promptText="2. Municipio" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="cmbLocalidadEdit" promptText="3. Localidad" maxWidth="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <VBox spacing="8" style="-fx-background-color: #f9f9f9; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #eee;">
+                    <ComboBox fx:id="cmbEstado" maxWidth="Infinity" promptText="1. Estado" />
+                    <ComboBox fx:id="cmbMuni" disable="true" maxWidth="Infinity" promptText="2. Municipio" />
+                    <ComboBox fx:id="cmbLocalidad" disable="true" maxWidth="Infinity" promptText="3. Localidad" />
+                </VBox>
 
-            <VBox spacing="5" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                <TextField fx:id="txtUsuarioEdit" promptText="Usuario"/>
-                <PasswordField fx:id="txtContraEdit" promptText="Nueva Contraseña (Opcional)"/>
+                <!-- Login y Estatus -->
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Credenciales y Estatus" />
+                <GridPane hgap="10" vgap="10">
+                    <TextField fx:id="txtUsuario" promptText="Usuario" GridPane.columnIndex="0" />
+                    <PasswordField fx:id="txtContra" promptText="Contraseña" GridPane.columnIndex="1" />
+                    <!-- CHECKBOX DE ACTIVO -->
+                    <CheckBox fx:id="chkActivo" selected="true" text="Usuario Activo (Acceso permitido)" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
             </VBox>
-        </GridPane>
 
-        <HBox alignment="CENTER_RIGHT" spacing="10">
-            <Button fx:id="btnActualizar" text="Actualizar Datos" onAction="#actualizarEmpleado" disable="true" style="-fx-background-color: #f39c12; -fx-text-fill: white;"/>
+            <VBox VBox.vgrow="ALWAYS" />
 
-            <!-- Botón inteligente: Cambia texto según estado -->
-            <Button fx:id="btnEliminar" text="Eliminar / Reactivar" onAction="#eliminarOReactivarEmpleado" disable="true" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+            <Separator />
 
-            <Button text="Cancelar Selección" onAction="#limpiarSeleccion" style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
-        </HBox>
-    </VBox>
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <!-- Botón con el nombre actualizado -->
+                <Button fx:id="btnEliminar" onAction="#eliminarOReactivarEmpleado" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Eliminar / Dar de Baja" visible="false" />
 
-    <Label fx:id="lblMensaje" textFill="blue"/>
+                <Button onAction="#guardarEmpleado" prefWidth="150" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" text="Guardar Datos" />
+            </HBox>
 
+            <!-- Label para Mensajes -->
+            <Label fx:id="lblMensaje" minHeight="40" textFill="blue" wrapText="true" />
+
+        </VBox>
+
+    </SplitPane>
 </VBox>

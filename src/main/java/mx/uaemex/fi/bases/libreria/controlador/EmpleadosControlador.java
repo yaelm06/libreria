@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,33 +26,36 @@ import java.util.stream.Collectors;
 
 public class EmpleadosControlador {
 
-    // --- AGREGAR ---
-    @FXML private TextField txtNombreAdd, txtPaternoAdd, txtMaternoAdd;
-    @FXML private ComboBox<String> cmbCargoAdd;
-    @FXML private TextField txtTelefonoAdd, txtEmailAdd, txtCalleAdd, txtNumeroAdd, txtUsuarioAdd;
-    @FXML private PasswordField txtContraAdd;
-    @FXML private ComboBox<Estado> cmbEstadoAdd;
-    @FXML private ComboBox<Municipio> cmbMuniAdd;
-    @FXML private ComboBox<Localidad> cmbLocalidadAdd;
+    // --- FORMULARIO ÚNICO ---
+    @FXML private TextField txtNombre, txtPaterno, txtMaterno;
+    @FXML private ComboBox<String> cmbCargo;
+    @FXML private TextField txtTelefono, txtEmail, txtCalle, txtNumero, txtUsuario;
+    @FXML private PasswordField txtContra;
+    @FXML private CheckBox chkActivo;
+
+    @FXML private ComboBox<Estado> cmbEstado;
+    @FXML private ComboBox<Municipio> cmbMuni;
+    @FXML private ComboBox<Localidad> cmbLocalidad;
+    @FXML private Label lblModo;
+    @FXML private Button btnEliminar;
 
     // --- TABLA Y BUSQUEDA ---
     @FXML private TableView<Empleado> tblEmpleados;
+    // Columnas COMPLETAS
     @FXML private TableColumn<Empleado, Integer> colId;
-    @FXML private TableColumn<Empleado, String> colNombre, colApellido, colCargo, colUsuario, colEmail, colTelefono, colLocalidadInfo, colActivo;
-    @FXML private TextField txtBuscarNombre, txtBuscarUsuario;
+    @FXML private TableColumn<Empleado, String> colNombre, colPaterno, colMaterno, colCargo, colUsuario, colEmail, colTelefono, colCalle, colNumero, colLocalidadInfo, colActivo;
+
+    // Filtros COMPLETOS
+    @FXML private TextField txtBuscarNombre, txtBuscarPaterno, txtBuscarMaterno;
+    @FXML private ComboBox<String> cmbBuscarCargo;
+    @FXML private TextField txtBuscarUsuario, txtBuscarEmail;
+    @FXML private TextField txtBuscarTelefono, txtBuscarCalle, txtBuscarNumero;
     @FXML private ComboBox<Estado> cmbBuscarEstado;
+    @FXML private ComboBox<Municipio> cmbBuscarMuni;
+    @FXML private ComboBox<Localidad> cmbBuscarLocalidad;
+    @FXML private ComboBox<String> cmbBuscarEstatus;
+
     @FXML private Label lblTotal;
-
-    // --- EDITAR ---
-    @FXML private TextField txtNombreEdit, txtPaternoEdit, txtMaternoEdit;
-    @FXML private ComboBox<String> cmbCargoEdit;
-    @FXML private TextField txtTelefonoEdit, txtEmailEdit, txtCalleEdit, txtNumeroEdit, txtUsuarioEdit;
-    @FXML private PasswordField txtContraEdit;
-    @FXML private ComboBox<Estado> cmbEstadoEdit;
-    @FXML private ComboBox<Municipio> cmbMuniEdit;
-    @FXML private ComboBox<Localidad> cmbLocalidadEdit;
-
-    @FXML private Button btnActualizar, btnEliminar;
     @FXML private Label lblMensaje;
 
     private ConexionBD con;
@@ -60,8 +64,7 @@ public class EmpleadosControlador {
     private MunicipioDAOPsqlImp municipioDAO;
     private EstadoDAOPsqlImp estadoDAO;
 
-    private Empleado empleadoSeleccionado;
-
+    private Empleado empleadoSeleccionado = null;
     private ArrayList<Municipio> todosMunicipios;
     private ArrayList<Localidad> todasLocalidades;
 
@@ -84,16 +87,24 @@ public class EmpleadosControlador {
         cargarDatosIniciales();
     }
 
+    @FXML
+    void regresarMenu(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+    }
+
     private void configurarTabla() {
+        // Mapeo de TODAS las columnas
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colPaterno.setCellValueFactory(new PropertyValueFactory<>("apellidoPaterno"));
+        colMaterno.setCellValueFactory(new PropertyValueFactory<>("apellidoMaterno"));
         colCargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         colUsuario.setCellValueFactory(new PropertyValueFactory<>("usuario"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-
-        colApellido.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getApellidoPaterno() + " " + cell.getValue().getApellidoMaterno()));
+        colCalle.setCellValueFactory(new PropertyValueFactory<>("calle"));
+        colNumero.setCellValueFactory(new PropertyValueFactory<>("numeroCalle"));
 
         colActivo.setCellValueFactory(cell ->
                 new SimpleStringProperty(Boolean.TRUE.equals(cell.getValue().isActivo()) ? "Sí" : "No"));
@@ -109,28 +120,20 @@ public class EmpleadosControlador {
         });
 
         tblEmpleados.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            empleadoSeleccionado = newSel;
             if (newSel != null) {
-                cargarEmpleadoEnEdicion(newSel);
-                btnActualizar.setDisable(false);
-                btnEliminar.setDisable(false);
-
-                if (Boolean.TRUE.equals(newSel.isActivo())) {
-                    btnEliminar.setText("Dar de Baja");
-                    btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
-                } else {
-                    btnEliminar.setText("Reactivar");
-                    btnEliminar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
-                }
+                cargarEmpleadoEnFormulario(newSel);
             }
         });
     }
 
     private void configurarCascadas() {
-        cmbEstadoAdd.setOnAction(e -> filtrarMunicipios(cmbEstadoAdd, cmbMuniAdd, cmbLocalidadAdd));
-        cmbMuniAdd.setOnAction(e -> filtrarLocalidades(cmbMuniAdd, cmbLocalidadAdd));
-        cmbEstadoEdit.setOnAction(e -> filtrarMunicipios(cmbEstadoEdit, cmbMuniEdit, cmbLocalidadEdit));
-        cmbMuniEdit.setOnAction(e -> filtrarLocalidades(cmbMuniEdit, cmbLocalidadEdit));
+        // Cascada Formulario
+        cmbEstado.setOnAction(e -> filtrarMunicipios(cmbEstado, cmbMuni, cmbLocalidad));
+        cmbMuni.setOnAction(e -> filtrarLocalidades(cmbMuni, cmbLocalidad));
+
+        // Cascada Búsqueda
+        cmbBuscarEstado.setOnAction(e -> filtrarMunicipios(cmbBuscarEstado, cmbBuscarMuni, cmbBuscarLocalidad));
+        cmbBuscarMuni.setOnAction(e -> filtrarLocalidades(cmbBuscarMuni, cmbBuscarLocalidad));
     }
 
     private void filtrarMunicipios(ComboBox<Estado> cbEstado, ComboBox<Municipio> cbMuni, ComboBox<Localidad> cbLoc) {
@@ -153,7 +156,6 @@ public class EmpleadosControlador {
     private void filtrarLocalidades(ComboBox<Municipio> cbMuni, ComboBox<Localidad> cbLoc) {
         Municipio mun = cbMuni.getValue();
         cbLoc.getSelectionModel().clearSelection();
-
         if (mun != null) {
             ArrayList<Localidad> filtrados = todasLocalidades.stream()
                     .filter(l -> l.getMunicipio().getNombre().equals(mun.getNombre()))
@@ -166,11 +168,15 @@ public class EmpleadosControlador {
     }
 
     private void cargarDatosIniciales() {
-        cargarEmpleados(null);
         recargarListasUbicacion(null);
-        ObservableList<String> cargos = FXCollections.observableArrayList("Administrador", "Vendedor");
-        cmbCargoAdd.setItems(cargos);
-        cmbCargoEdit.setItems(cargos);
+
+        ObservableList<String> cargos = FXCollections.observableArrayList("Administrador", "Vendedor", "Gerente");
+        cmbCargo.setItems(cargos);
+        cmbBuscarCargo.setItems(cargos);
+
+        cmbBuscarEstatus.setItems(FXCollections.observableArrayList("Activos", "Inactivos", "Todos"));
+
+        cargarEmpleados(null);
     }
 
     @FXML
@@ -181,9 +187,12 @@ public class EmpleadosControlador {
             todasLocalidades = localidadDAO.consultar();
 
             ObservableList<Estado> obsEstados = FXCollections.observableArrayList(estados);
-            cmbEstadoAdd.setItems(obsEstados);
-            cmbEstadoEdit.setItems(obsEstados);
+            cmbEstado.setItems(obsEstados);
             cmbBuscarEstado.setItems(obsEstados);
+
+            // Inicializar combos búsqueda limpios
+            cmbBuscarMuni.setItems(FXCollections.observableArrayList());
+            cmbBuscarLocalidad.setItems(FXCollections.observableArrayList());
 
             tblEmpleados.refresh();
         } catch(Exception ex) { ex.printStackTrace(); }
@@ -191,166 +200,207 @@ public class EmpleadosControlador {
 
     @FXML
     void cargarEmpleados(ActionEvent e) {
-        txtBuscarNombre.clear();
-        txtBuscarUsuario.clear();
+        limpiarFiltros();
+        cmbBuscarEstatus.getSelectionModel().select("Todos");
+        buscarEmpleado(null);
+    }
+
+    private void limpiarFiltros() {
+        txtBuscarNombre.clear(); txtBuscarPaterno.clear(); txtBuscarMaterno.clear();
+        txtBuscarUsuario.clear(); txtBuscarEmail.clear(); txtBuscarTelefono.clear();
+        txtBuscarCalle.clear(); txtBuscarNumero.clear();
+        cmbBuscarCargo.getSelectionModel().clearSelection();
         cmbBuscarEstado.getSelectionModel().clearSelection();
-        try {
-            Empleado filtroTodos = new Empleado();
-            filtroTodos.setActivo(null);
-            ArrayList<Empleado> lista = empleadoDAO.consultar(filtroTodos);
-            tblEmpleados.setItems(FXCollections.observableArrayList(lista));
-            lblTotal.setText("Encontrados: " + lista.size());
-        } catch (Exception ex) { ex.printStackTrace(); }
+        cmbBuscarMuni.getSelectionModel().clearSelection();
+        cmbBuscarLocalidad.getSelectionModel().clearSelection();
     }
 
     @FXML
     void buscarEmpleado(ActionEvent e) {
         Empleado filtro = new Empleado();
+
         if(!txtBuscarNombre.getText().isEmpty()) filtro.setNombre(txtBuscarNombre.getText());
+        if(!txtBuscarPaterno.getText().isEmpty()) filtro.setApellidoPaterno(txtBuscarPaterno.getText());
+        if(!txtBuscarMaterno.getText().isEmpty()) filtro.setApellidoMaterno(txtBuscarMaterno.getText());
+        if(cmbBuscarCargo.getValue() != null) filtro.setCargo(cmbBuscarCargo.getValue());
+
         if(!txtBuscarUsuario.getText().isEmpty()) filtro.setUsuario(txtBuscarUsuario.getText());
-        filtro.setActivo(null);
+        if(!txtBuscarEmail.getText().isEmpty()) filtro.setEmail(txtBuscarEmail.getText());
+        if(!txtBuscarTelefono.getText().isEmpty()) filtro.setTelefono(txtBuscarTelefono.getText());
+
+        if(!txtBuscarCalle.getText().isEmpty()) filtro.setCalle(txtBuscarCalle.getText());
+        if(!txtBuscarNumero.getText().isEmpty()) filtro.setNumeroCalle(txtBuscarNumero.getText());
+
+        String estatus = cmbBuscarEstatus.getValue();
+        if ("Activos".equals(estatus)) filtro.setActivo(true);
+        else if ("Inactivos".equals(estatus)) filtro.setActivo(false);
+        else filtro.setActivo(null);
 
         ArrayList<Empleado> res = empleadoDAO.consultar(filtro);
 
-        if (cmbBuscarEstado.getValue() != null) {
+        // Filtro de Ubicación (Cascada en Memoria)
+        if (cmbBuscarLocalidad.getValue() != null) {
+            int idLoc = cmbBuscarLocalidad.getValue().getId();
+            res = res.stream().filter(emp -> emp.getIdLocalidad() == idLoc).collect(Collectors.toCollection(ArrayList::new));
+        } else if (cmbBuscarMuni.getValue() != null) {
+            String nombreMuni = cmbBuscarMuni.getValue().getNombre();
             res = res.stream().filter(emp -> {
                 for(Localidad loc : todasLocalidades) {
-                    if(loc.getId() == emp.getIdLocalidad()) {
-                        return loc.getEstado().getNombre().equals(cmbBuscarEstado.getValue().getNombre());
-                    }
+                    if(loc.getId() == emp.getIdLocalidad()) return loc.getMunicipio().getNombre().equals(nombreMuni);
+                }
+                return false;
+            }).collect(Collectors.toCollection(ArrayList::new));
+        } else if (cmbBuscarEstado.getValue() != null) {
+            String nombreEstado = cmbBuscarEstado.getValue().getNombre();
+            res = res.stream().filter(emp -> {
+                for(Localidad loc : todasLocalidades) {
+                    if(loc.getId() == emp.getIdLocalidad()) return loc.getEstado().getNombre().equals(nombreEstado);
                 }
                 return false;
             }).collect(Collectors.toCollection(ArrayList::new));
         }
 
         tblEmpleados.setItems(FXCollections.observableArrayList(res));
-        lblTotal.setText("Encontrados: " + res.size());
+        lblTotal.setText("Registros: " + res.size());
     }
 
+    // --- BOTÓN "NUEVO EMPLEADO" ---
     @FXML
-    void agregarEmpleado(ActionEvent e) {
-        try {
-            if(cmbLocalidadAdd.getValue() == null) throw new RuntimeException("Seleccione una Localidad (Complete los 3 pasos).");
-            if(cmbCargoAdd.getValue() == null) throw new RuntimeException("Seleccione un Cargo");
+    void nuevoEmpleado(ActionEvent e) {
+        limpiarFormulario();
+        lblModo.setText("(Nuevo)");
+        lblModo.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+        btnEliminar.setVisible(false);
+        tblEmpleados.getSelectionModel().clearSelection();
+        empleadoSeleccionado = null;
+        chkActivo.setSelected(true);
+        lblMensaje.setText("");
+    }
 
-            String usuario = txtUsuarioAdd.getText().trim();
+    // --- BOTÓN "GUARDAR DATOS" (Insert o Update) ---
+    @FXML
+    void guardarEmpleado(ActionEvent e) {
+        try {
+            if(cmbLocalidad.getValue() == null) throw new RuntimeException("Seleccione una Localidad.");
+            if(cmbCargo.getValue() == null) throw new RuntimeException("Seleccione un Cargo.");
+            String usuario = txtUsuario.getText().trim();
             if(usuario.isEmpty()) throw new RuntimeException("Usuario obligatorio");
 
-            Empleado busqueda = new Empleado();
-            busqueda.setUsuario(usuario);
-            busqueda.setActivo(null);
+            // INSERTAR
+            if (empleadoSeleccionado == null) {
+                Empleado busqueda = new Empleado();
+                busqueda.setUsuario(usuario);
+                busqueda.setActivo(null);
+                ArrayList<Empleado> existentes = empleadoDAO.consultar(busqueda);
 
-            ArrayList<Empleado> existentes = empleadoDAO.consultar(busqueda);
-
-            if (!existentes.isEmpty()) {
-                Empleado existente = existentes.get(0);
-                if (Boolean.TRUE.equals(existente.isActivo())) {
-                    throw new RuntimeException("El usuario '" + usuario + "' ya existe.");
-                } else {
-                    actualizarDatosObjeto(existente, true);
-                    existente.setActivo(true);
-                    empleadoDAO.actualizar(existente);
-                    lblMensaje.setText("Empleado reactivado y actualizado.");
-                    limpiarFormularioAgregar();
-                    cargarEmpleados(null);
-                    return;
+                if (!existentes.isEmpty()) {
+                    Empleado existente = existentes.get(0);
+                    if (Boolean.TRUE.equals(existente.isActivo())) {
+                        throw new RuntimeException("El usuario '" + usuario + "' ya existe.");
+                    } else {
+                        // Reactivar
+                        leerDatosDelFormulario(existente);
+                        existente.setActivo(true);
+                        empleadoDAO.actualizar(existente);
+                        mostrarMensaje("Empleado reactivado exitosamente.", true);
+                        nuevoEmpleado(null);
+                        buscarEmpleado(null);
+                        return;
+                    }
                 }
+
+                Empleado nuevo = new Empleado();
+                leerDatosDelFormulario(nuevo);
+                empleadoDAO.insertar(nuevo);
+                mostrarMensaje("Empleado registrado exitosamente.", true);
+            }
+            // ACTUALIZAR
+            else {
+                leerDatosDelFormulario(empleadoSeleccionado);
+                empleadoDAO.actualizar(empleadoSeleccionado);
+                mostrarMensaje("Empleado actualizado correctamente.", true);
             }
 
-            Empleado nuevo = new Empleado();
-            actualizarDatosObjeto(nuevo, true);
-            empleadoDAO.insertar(nuevo);
-
-            lblMensaje.setText("Empleado registrado correctamente.");
-            limpiarFormularioAgregar();
-            cargarEmpleados(null);
+            nuevoEmpleado(null);
+            buscarEmpleado(null);
 
         } catch (Exception ex) {
-            lblMensaje.setText("Error: " + ex.getMessage());
+            mostrarMensaje("No se pudo completar la acción: " + ex.getMessage(), false);
         }
     }
 
-    private void actualizarDatosObjeto(Empleado emp, boolean desdeAdd) {
-        if(desdeAdd) {
-            emp.setNombre(txtNombreAdd.getText());
-            emp.setApellidoPaterno(txtPaternoAdd.getText());
-            emp.setApellidoMaterno(txtMaternoAdd.getText());
-            emp.setCargo(cmbCargoAdd.getValue());
-            emp.setTelefono(txtTelefonoAdd.getText());
-            emp.setEmail(txtEmailAdd.getText());
-            emp.setCalle(txtCalleAdd.getText());
-            emp.setNumeroCalle(txtNumeroAdd.getText());
-            emp.setUsuario(txtUsuarioAdd.getText());
-            emp.setContrasenia(txtContraAdd.getText());
-            emp.setIdLocalidad(cmbLocalidadAdd.getValue().getId());
-        } else {
-            emp.setNombre(txtNombreEdit.getText());
-            emp.setApellidoPaterno(txtPaternoEdit.getText());
-            emp.setApellidoMaterno(txtMaternoEdit.getText());
-            emp.setCargo(cmbCargoEdit.getValue());
-            emp.setTelefono(txtTelefonoEdit.getText());
-            emp.setEmail(txtEmailEdit.getText());
-            emp.setCalle(txtCalleEdit.getText());
-            emp.setNumeroCalle(txtNumeroEdit.getText());
-            emp.setUsuario(txtUsuarioEdit.getText());
-            if(!txtContraEdit.getText().isEmpty()) emp.setContrasenia(txtContraEdit.getText());
-            if(cmbLocalidadEdit.getValue() != null) emp.setIdLocalidad(cmbLocalidadEdit.getValue().getId());
-        }
+    private void leerDatosDelFormulario(Empleado emp) {
+        emp.setNombre(txtNombre.getText());
+        emp.setApellidoPaterno(txtPaterno.getText());
+        emp.setApellidoMaterno(txtMaterno.getText());
+        emp.setCargo(cmbCargo.getValue());
+        emp.setTelefono(txtTelefono.getText());
+        emp.setEmail(txtEmail.getText());
+        emp.setCalle(txtCalle.getText());
+        emp.setNumeroCalle(txtNumero.getText());
+        emp.setUsuario(txtUsuario.getText());
+        if(!txtContra.getText().isEmpty()) emp.setContrasenia(txtContra.getText());
+        if(cmbLocalidad.getValue() != null) emp.setIdLocalidad(cmbLocalidad.getValue().getId());
+        emp.setActivo(chkActivo.isSelected());
     }
 
-    private void cargarEmpleadoEnEdicion(Empleado emp) {
-        txtNombreEdit.setText(emp.getNombre());
-        txtPaternoEdit.setText(emp.getApellidoPaterno());
-        txtMaternoEdit.setText(emp.getApellidoMaterno());
-        cmbCargoEdit.setValue(emp.getCargo());
-        txtTelefonoEdit.setText(emp.getTelefono());
-        txtEmailEdit.setText(emp.getEmail());
-        txtCalleEdit.setText(emp.getCalle());
-        txtNumeroEdit.setText(emp.getNumeroCalle());
-        txtUsuarioEdit.setText(emp.getUsuario());
-        txtContraEdit.clear();
+    private void cargarEmpleadoEnFormulario(Empleado emp) {
+        empleadoSeleccionado = emp;
+        lblModo.setText("(Editando ID: " + emp.getId() + ")");
+        lblModo.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
+
+        txtNombre.setText(emp.getNombre());
+        txtPaterno.setText(emp.getApellidoPaterno());
+        txtMaterno.setText(emp.getApellidoMaterno());
+        cmbCargo.setValue(emp.getCargo());
+        txtTelefono.setText(emp.getTelefono());
+        txtEmail.setText(emp.getEmail());
+        txtCalle.setText(emp.getCalle());
+        txtNumero.setText(emp.getNumeroCalle());
+        txtUsuario.setText(emp.getUsuario());
+        txtContra.clear();
+
+        chkActivo.setSelected(Boolean.TRUE.equals(emp.isActivo()));
 
         Localidad locCompleta = null;
-        for(Localidad l : todasLocalidades) {
-            if(l.getId() == emp.getIdLocalidad()) {
-                locCompleta = l;
-                break;
+        if(todasLocalidades != null) {
+            for(Localidad l : todasLocalidades) {
+                if(l.getId() == emp.getIdLocalidad()) {
+                    locCompleta = l;
+                    break;
+                }
             }
         }
 
         if (locCompleta != null) {
-            for(Estado e : cmbEstadoEdit.getItems()) {
+            for(Estado e : cmbEstado.getItems()) {
                 if(e.getNombre().equals(locCompleta.getEstado().getNombre())) {
-                    cmbEstadoEdit.setValue(e);
+                    cmbEstado.setValue(e);
                     break;
                 }
             }
-            for(Municipio m : cmbMuniEdit.getItems()) {
+            for(Municipio m : cmbMuni.getItems()) {
                 if(m.getNombre().equals(locCompleta.getMunicipio().getNombre())) {
-                    cmbMuniEdit.setValue(m);
+                    cmbMuni.setValue(m);
                     break;
                 }
             }
-            for(Localidad l : cmbLocalidadEdit.getItems()) {
+            for(Localidad l : cmbLocalidad.getItems()) {
                 if(l.getId() == locCompleta.getId()) {
-                    cmbLocalidadEdit.setValue(l);
+                    cmbLocalidad.setValue(l);
                     break;
                 }
             }
         }
-    }
 
-    @FXML
-    void actualizarEmpleado(ActionEvent e) {
-        try {
-            if(empleadoSeleccionado == null) return;
-            actualizarDatosObjeto(empleadoSeleccionado, false);
-            empleadoDAO.actualizar(empleadoSeleccionado);
-            lblMensaje.setText("Empleado actualizado.");
-            limpiarSeleccion(null);
-            cargarEmpleados(null);
-        } catch (Exception ex) {
-            lblMensaje.setText("Error: " + ex.getMessage());
+        btnEliminar.setVisible(true);
+        // CAMBIO DE TEXTO DEL BOTÓN
+        btnEliminar.setText("Eliminar / Dar de Baja");
+        if (Boolean.TRUE.equals(emp.isActivo())) {
+            btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+        } else {
+            btnEliminar.setText("Reactivar");
+            btnEliminar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
         }
     }
 
@@ -361,17 +411,17 @@ public class EmpleadosControlador {
 
             if (Boolean.TRUE.equals(empleadoSeleccionado.isActivo())) {
                 empleadoDAO.borrar(empleadoSeleccionado);
-                lblMensaje.setText("Empleado dado de baja.");
+                mostrarMensaje("Se ha inactivado al empleado correctamente.", true);
             } else {
                 empleadoSeleccionado.setActivo(true);
                 empleadoDAO.actualizar(empleadoSeleccionado);
-                lblMensaje.setText("Empleado reactivado.");
+                mostrarMensaje("Empleado reactivado correctamente.", true);
             }
 
-            limpiarSeleccion(null);
-            cargarEmpleados(null);
+            nuevoEmpleado(null);
+            buscarEmpleado(null);
         } catch (Exception ex) {
-            lblMensaje.setText("Error: " + ex.getMessage());
+            mostrarMensaje("No se pudo eliminar/reactivar: " + ex.getMessage(), false);
         }
     }
 
@@ -387,47 +437,40 @@ public class EmpleadosControlador {
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            // CORRECCIÓN: Tamaño reducido para evitar que se desborde
             stage.setTitle("Gestión Rápida de Ubicaciones");
             stage.setScene(new Scene(root, 800, 550));
             stage.centerOnScreen();
             stage.showAndWait();
 
             recargarListasUbicacion(null);
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    @FXML
-    void limpiarSeleccion(ActionEvent e) {
-        empleadoSeleccionado = null;
-        txtNombreEdit.clear(); txtPaternoEdit.clear(); txtMaternoEdit.clear();
-        cmbCargoEdit.getSelectionModel().clearSelection();
-        txtTelefonoEdit.clear(); txtEmailEdit.clear();
-        txtCalleEdit.clear(); txtNumeroEdit.clear(); txtUsuarioEdit.clear();
-        txtContraEdit.clear();
+    private void limpiarFormulario() {
+        txtNombre.clear(); txtPaterno.clear(); txtMaterno.clear();
+        cmbCargo.getSelectionModel().clearSelection();
+        txtTelefono.clear(); txtEmail.clear();
+        txtCalle.clear(); txtNumero.clear(); txtUsuario.clear();
+        txtContra.clear();
 
-        cmbEstadoEdit.getSelectionModel().clearSelection();
-        cmbMuniEdit.setDisable(true);
-        cmbLocalidadEdit.setDisable(true);
-
-        tblEmpleados.getSelectionModel().clearSelection();
-        btnActualizar.setDisable(true);
-        btnEliminar.setDisable(true);
-        btnEliminar.setText("Eliminar / Reactivar");
+        cmbEstado.getSelectionModel().clearSelection();
+        cmbMuni.setDisable(true);
+        cmbLocalidad.setDisable(true);
+        chkActivo.setSelected(true);
+        lblMensaje.setText("");
     }
 
-    private void limpiarFormularioAgregar() {
-        txtNombreAdd.clear(); txtPaternoAdd.clear(); txtMaternoAdd.clear();
-        cmbCargoAdd.getSelectionModel().clearSelection();
-        txtTelefonoAdd.clear(); txtEmailAdd.clear();
-        txtCalleAdd.clear(); txtNumeroAdd.clear(); txtUsuarioAdd.clear();
-        txtContraAdd.clear();
-
-        cmbEstadoAdd.getSelectionModel().clearSelection();
-        cmbMuniAdd.setDisable(true);
-        cmbLocalidadAdd.setDisable(true);
+    // Método auxiliar para mensajes con estilo visible
+    private void mostrarMensaje(String mensaje, boolean exito) {
+        lblMensaje.setText(mensaje);
+        if (exito) {
+            // Estilo para éxito (Verde fuerte, negrita, tamaño grande)
+            lblMensaje.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 16px; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);");
+        } else {
+            // Estilo para error (Rojo fuerte, negrita, tamaño grande)
+            lblMensaje.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 16px; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);");
+        }
     }
 }

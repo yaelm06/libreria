@@ -3,67 +3,93 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uaemex.fi.bases.libreria.controlador.MenuPrincipalControlador"
             stylesheets="@estilos.css"
-            prefWidth="1000" prefHeight="700">
+            style="-fx-background-color: #ecf0f1;"
+            prefWidth="900" prefHeight="600">
 
-    <!-- === BARRA LATERAL === -->
-    <left>
-        <VBox spacing="10" styleClass="sidebar" prefWidth="250">
-            <Label text="Librería System" styleClass="app-title">
-                <font><Font name="Segoe UI" size="20"/></font>
+    <!-- === ENCABEZADO (TOP) === -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
+            <Label text="📚 Librería System" textFill="white">
+                <font><Font name="Segoe UI Bold" size="24.0"/></font>
             </Label>
 
-            <Separator opacity="0.3"/>
+            <VBox HBox.hgrow="ALWAYS" /> <!-- Espaciador -->
 
-            <VBox spacing="2" alignment="CENTER_LEFT" style="-fx-padding: 0 0 10 15;">
-                <Label fx:id="lblBienvenida" text="Usuario" textFill="white">
-                    <font><Font name="System" size="14"/></font>
-                    <style>-fx-font-weight: bold;</style>
-                </Label>
-                <Label fx:id="lblRol" text="Rol" textFill="#bdc3c7" style="-fx-font-size: 12;"/>
+            <VBox alignment="CENTER_RIGHT">
+                <Label fx:id="lblBienvenida" text="Bienvenido, Usuario" textFill="white" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblRol" text="Rol: ..." textFill="#bdc3c7" style="-fx-font-size: 12px;"/>
             </VBox>
 
-            <Separator opacity="0.3"/>
+            <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="logout-button"/>
+        </HBox>
+    </top>
 
-            <Label text="OPERACIONES" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 10 0 5 15;"/>
-
-            <Button fx:id="btnVentas" text="🛒  Punto de Venta" maxWidth="Infinity" styleClass="menu-button"/>
-            <Button fx:id="btnLibros" text="📚  Inventario" maxWidth="Infinity" styleClass="menu-button"/>
-            <Button fx:id="btnClientes" text="👥  Clientes" maxWidth="Infinity" styleClass="menu-button"/>
-
-            <Label text="ADMINISTRACIÓN" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 10 0 5 15;"/>
-
-            <Button fx:id="btnEmpleados" text="💳  Empleados" onAction="#mostrarVistaEmpleados" maxWidth="Infinity" styleClass="menu-button"/>
-            <Button fx:id="btnUbicaciones" text="📍  Ubicaciones" onAction="#mostrarVistaUbicaciones" maxWidth="Infinity" styleClass="menu-button"/>
-
-            <VBox VBox.vgrow="ALWAYS" />
-            <Button text="Cerrar Sesión" onAction="#cerrarSesion" maxWidth="Infinity" styleClass="logout-button"/>
-        </VBox>
-    </left>
-
-    <!-- === ÁREA DE CONTENIDO (CON SCROLL) === -->
+    <!-- === CONTENIDO CENTRAL (GRID DE OPCIONES) === -->
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;">
-            <content>
-                <StackPane fx:id="contentArea" styleClass="content-area">
-                    <!-- Contenido por defecto -->
-                    <VBox alignment="CENTER" spacing="20">
-                        <Label text="¡Bienvenido al Sistema!" style="-fx-font-size: 32px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;"/>
-                        <Label text="Selecciona una opción del menú para comenzar." style="-fx-font-size: 16px; -fx-text-fill: #7f8c8d;"/>
-                    </VBox>
-                </StackPane>
-            </content>
-        </ScrollPane>
+        <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
+            <Label text="Panel de Control" style="-fx-font-size: 28px; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+
+            <GridPane hgap="30" vgap="30" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints prefWidth="200" halignment="CENTER"/>
+                    <ColumnConstraints prefWidth="200" halignment="CENTER"/>
+                    <ColumnConstraints prefWidth="200" halignment="CENTER"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="150" valignment="CENTER"/>
+                    <RowConstraints prefHeight="150" valignment="CENTER"/>
+                </rowConstraints>
+
+                <!-- FILA 1: OPERACIONES -->
+                <Button fx:id="btnVentas" text="🛒 Punto de Venta"
+                        styleClass="dashboard-button"
+                        GridPane.columnIndex="0" GridPane.rowIndex="0"
+                        maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <Button fx:id="btnLibros" text="📚 Inventario"
+                        styleClass="dashboard-button"
+                        GridPane.columnIndex="1" GridPane.rowIndex="0"
+                        maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <Button fx:id="btnClientes" text="👥 Clientes"
+                        styleClass="dashboard-button"
+                        GridPane.columnIndex="2" GridPane.rowIndex="0"
+                        maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <!-- FILA 2: ADMINISTRACIÓN -->
+                <Button fx:id="btnEmpleados" text="💳 Empleados" onAction="#mostrarVistaEmpleados"
+                        styleClass="dashboard-button-admin"
+                        GridPane.columnIndex="0" GridPane.rowIndex="1"
+                        maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <Button fx:id="btnUbicaciones" text="📍 Ubicaciones" onAction="#mostrarVistaUbicaciones"
+                        styleClass="dashboard-button-admin"
+                        GridPane.columnIndex="1" GridPane.rowIndex="1"
+                        maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <!-- Espacio vacío -->
+                <VBox style="-fx-background-color: transparent;" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            </GridPane>
+        </VBox>
     </center>
+
+    <!-- === PIE DE PÁGINA === -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 10;">
+            <Label text="Sistema de Gestión de Librería v1.0 - Equipo Anyatec" textFill="#95a5a6"/>
+        </HBox>
+    </bottom>
 
 </BorderPane>

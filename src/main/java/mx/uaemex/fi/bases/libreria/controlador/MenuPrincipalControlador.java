@@ -8,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import mx.uaemex.fi.bases.libreria.modelo.ConexionBD;
 import mx.uaemex.fi.bases.libreria.modelo.data.Empleado;
@@ -20,7 +19,6 @@ public class MenuPrincipalControlador {
 
     @FXML private Label lblBienvenida;
     @FXML private Label lblRol;
-    @FXML private StackPane contentArea; // Se mantiene por si usas el dashboard para otras cosas
 
     @FXML private Button btnVentas;
     @FXML private Button btnLibros;
@@ -34,8 +32,8 @@ public class MenuPrincipalControlador {
     public void initData(ConexionBD conexion, Empleado empleado) {
         this.con = conexion;
         this.empleadoLogueado = empleado;
-        lblBienvenida.setText(empleado.getNombre());
-        lblRol.setText(empleado.getCargo());
+        lblBienvenida.setText("Bienvenido, " + empleado.getNombre());
+        lblRol.setText("Rol: " + empleado.getCargo());
         configurarPermisos();
     }
 
@@ -48,49 +46,45 @@ public class MenuPrincipalControlador {
         }
     }
 
-    // --- CAMBIO: ABRIR EMPLEADOS EN NUEVA VENTANA ---
+    // --- MÉTODO CORREGIDO: Abre ventana independiente ---
     @FXML
     void mostrarVistaEmpleados(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uaemex/fi/bases/libreria/EmpleadosVista.fxml"));
-            Parent root = loader.load();
-
-            EmpleadosControlador ctrl = loader.getController();
-            Connection connSql = this.con.obtenerConexion();
-            ctrl.setConexionBD(this.con, connSql);
-
-            // Creamos un nuevo Stage (Ventana)
-            Stage stage = new Stage();
-            stage.setTitle("Gestión de Empleados");
-            stage.setScene(new Scene(root));
-            stage.setMaximized(true); // ¡Que use toda la pantalla!
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error al cargar ventana empleados: " + e.getMessage());
-        }
+        // Ruta absoluta correcta
+        abrirVentana("/mx/uaemex/fi/bases/libreria/EmpleadosVista.fxml", "Gestión de Empleados");
     }
 
-    // --- CAMBIO: ABRIR UBICACIONES EN NUEVA VENTANA ---
+    // --- MÉTODO CORREGIDO: Abre ventana independiente ---
     @FXML
     void mostrarVistaUbicaciones(ActionEvent event) {
+        // Ruta absoluta correcta
+        abrirVentana("/mx/uaemex/fi/bases/libreria/UbicacionesVista.fxml", "Gestión de Ubicaciones");
+    }
+
+    // Método genérico para abrir ventanas y manejar la conexión
+    private void abrirVentana(String fxmlPath, String titulo) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uaemex/fi/bases/libreria/UbicacionesVista.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            UbicacionesControlador ctrl = loader.getController();
+            // Inyección de dependencias manual (polimorfismo simple)
+            Object controller = loader.getController();
             Connection connSql = this.con.obtenerConexion();
-            ctrl.setConexionBD(this.con, connSql);
+
+            if (controller instanceof EmpleadosControlador) {
+                ((EmpleadosControlador) controller).setConexionBD(this.con, connSql);
+            } else if (controller instanceof UbicacionesControlador) {
+                ((UbicacionesControlador) controller).setConexionBD(this.con, connSql);
+            }
 
             Stage stage = new Stage();
-            stage.setTitle("Gestión de Ubicaciones");
-            stage.setScene(new Scene(root, 900, 600)); // Tamaño fijo cómodo
-            stage.centerOnScreen();
+            stage.setTitle(titulo);
+            stage.setScene(new Scene(root));
+            stage.setMaximized(true); // Pantalla completa para aprovechar espacio
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Error al cargar ventana: " + fxmlPath + " -> " + e.getMessage());
         }
     }
 
@@ -99,6 +93,7 @@ public class MenuPrincipalControlador {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uaemex/fi/bases/libreria/LoginVista.fxml"));
             Parent root = loader.load();
+
             LoginControlador ctrl = loader.getController();
             ctrl.setConexionBD(this.con);
 
