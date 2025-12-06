@@ -27,22 +27,18 @@ public class EditorialDAOPsqlImp extends AbstractSqlDAO implements EditorialDAO 
         StringBuilder sql = new StringBuilder("SELECT * FROM catalogo.teditorial");
         int cols = 0;
 
-        // --- CONSTRUCCIÓN DINÁMICA (QBE) ---
 
-        // 1. ID (Búsqueda exacta)
         if(e.getId() > 0) {
             sql.append(" WHERE id_editorial=").append(e.getId());
             cols++;
         }
 
-        // 2. Nombre Editorial
         if(e.getEditorial() != null && !e.getEditorial().isEmpty()) {
             if (cols > 0) sql.append(" AND editorial ILIKE '%").append(e.getEditorial()).append("%'");
             else { sql.append(" WHERE editorial ILIKE '%").append(e.getEditorial()).append("%'"); }
             cols++;
         }
 
-        // 3. País
         if(e.getPais() != null && !e.getPais().isEmpty()) {
             if (cols > 0) sql.append(" AND pais ILIKE '%").append(e.getPais()).append("%'");
             else { sql.append(" WHERE pais ILIKE '%").append(e.getPais()).append("%'"); }

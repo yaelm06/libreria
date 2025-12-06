@@ -16,13 +16,11 @@ import java.util.ArrayList;
 
 public class ClientesControlador {
 
-    // --- FORMULARIO ---
     @FXML private TextField txtNombre, txtPaterno, txtMaterno, txtTelefono;
     @FXML private CheckBox chkActivo;
     @FXML private Label lblModo;
     @FXML private Button btnEliminar;
 
-    // --- TABLA Y FILTROS ---
     @FXML private TableView<Cliente> tblClientes;
     @FXML private TableColumn<Cliente, Integer> colId;
     @FXML private TableColumn<Cliente, String> colNombre, colPaterno, colMaterno, colTelefono, colActivo;
@@ -105,7 +103,7 @@ public class ClientesControlador {
         btnEliminar.setVisible(false);
         tblClientes.getSelectionModel().clearSelection();
         clienteSeleccionado = null;
-        lblMensaje.setText(""); // Aquí sí limpiamos el mensaje
+        lblMensaje.setText("");
     }
 
     @FXML
@@ -117,7 +115,6 @@ public class ClientesControlador {
             String mensajeExito = "";
 
             if (clienteSeleccionado == null) {
-                // INSERTAR
                 Cliente busqueda = new Cliente();
                 busqueda.setNombre(txtNombre.getText());
                 busqueda.setApellidoPaterno(txtPaterno.getText());
@@ -137,7 +134,7 @@ public class ClientesControlador {
                                 mensajeExito = "Cliente reactivado correctamente.";
                                 nuevoCliente(null);
                                 buscarCliente(null);
-                                mostrarMensaje(mensajeExito, true); // Mostrar DESPUÉS de limpiar
+                                mostrarMensaje(mensajeExito, true);
                                 return;
                             } else {
                                 throw new RuntimeException("El cliente ya existe.");
@@ -152,7 +149,6 @@ public class ClientesControlador {
                 mensajeExito = "Cliente registrado exitosamente.";
 
             } else {
-                // ACTUALIZAR
                 leerDatos(clienteSeleccionado);
                 clientesDAO.actualizar(clienteSeleccionado);
                 mensajeExito = "Cliente actualizado correctamente.";
@@ -160,7 +156,7 @@ public class ClientesControlador {
 
             nuevoCliente(null);
             buscarCliente(null);
-            mostrarMensaje(mensajeExito, true); // Mostrar mensaje al final
+            mostrarMensaje(mensajeExito, true);
 
         } catch (Exception ex) {
             mostrarMensaje("Error: " + ex.getMessage(), false);
@@ -204,7 +200,6 @@ public class ClientesControlador {
             String mensajeExito = "";
 
             if (Boolean.TRUE.equals(clienteSeleccionado.isActivo())) {
-                // El DAO se encarga de intentar físico o lógico
                 clientesDAO.borrar(clienteSeleccionado);
                 mensajeExito = "Cliente eliminado o dado de baja correctamente.";
             } else {
@@ -230,10 +225,8 @@ public class ClientesControlador {
     private void mostrarMensaje(String mensaje, boolean exito) {
         lblMensaje.setText(mensaje);
         if (exito) {
-            // Verde limpio sin fondo para que no se vea una caja fea
             lblMensaje.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 13px;");
         } else {
-            // Rojo limpio
             lblMensaje.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 13px;");
         }
     }

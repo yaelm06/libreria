@@ -1,10 +1,10 @@
 package mx.uaemex.fi.bases.libreria.modelo.data;
 
 public class Localidad extends ElementoConID implements Data {
-    private String localidad; // En la BD es 'localidad'
+    private String localidad;
     private String codigoPostal;
-    private Municipio municipio; // Relación Objeto
-    private Estado estado;       // Relación Objeto (Solicitado explícitamente)
+    private Municipio municipio;
+    private Estado estado;
 
     public Localidad() {
         super();
@@ -48,7 +48,6 @@ public class Localidad extends ElementoConID implements Data {
 
     @Override
     public String toString() {
-        // Ejemplo: "Colonia Centro (50000)"
         return this.localidad + " (" + this.codigoPostal + ")";
     }
 }

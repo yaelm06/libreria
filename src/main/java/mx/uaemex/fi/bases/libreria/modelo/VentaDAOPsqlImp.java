@@ -42,7 +42,6 @@ public class VentaDAOPsqlImp extends AbstractSqlDAO implements VentaDAO {
 
         int cols = 0;
 
-        // 1. Filtros Básicos
         if (filtro.getId() > 0) {
             sql.append(" WHERE v.id_venta = ").append(filtro.getId());
             cols++;
@@ -64,7 +63,6 @@ public class VentaDAOPsqlImp extends AbstractSqlDAO implements VentaDAO {
             cols++;
         }
 
-        // 2. Filtros Rangos
         if (minTotal != null) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" v.total >= ").append(minTotal);
             cols++;
@@ -82,7 +80,6 @@ public class VentaDAOPsqlImp extends AbstractSqlDAO implements VentaDAO {
             cols++;
         }
 
-        // 3. NUEVO: Filtro por Libro (Subconsulta EXISTS)
         if (filtroLibro != null && !filtroLibro.isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE");
             sql.append(" EXISTS (SELECT 1 FROM ventas.tdetalleVenta dv JOIN catalogo.tlibro l ON dv.id_libro = l.id_libro WHERE dv.id_venta = v.id_venta AND l.titulo ILIKE '%").append(filtroLibro).append("%')");
@@ -122,7 +119,6 @@ public class VentaDAOPsqlImp extends AbstractSqlDAO implements VentaDAO {
         return lista;
     }
 
-    // NUEVO: Implementación Query 6 (Detalle)
     @Override
     public ArrayList<DetalleVenta> consultarDetalle(int idVenta) {
         ArrayList<DetalleVenta> detalles = new ArrayList<>();

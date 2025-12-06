@@ -20,7 +20,6 @@
 
 <VBox prefHeight="600" prefWidth="1000" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.bases.libreria.controlador.EmpleadosControlador">
 
-    <!-- BARRA SUPERIOR -->
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
         <Button onAction="#regresarMenu" style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;" text="⬅ Regresar al Menú" />
         <Separator orientation="VERTICAL" />
@@ -29,13 +28,10 @@
         </Label>
     </HBox>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <SplitPane dividerPositions="0.6" style="-fx-background-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS">
 
-        <!-- ================= IZQUIERDA: LISTA Y FILTROS ================= -->
         <VBox spacing="10">
 
-            <!-- Panel de Búsqueda -->
             <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1); -fx-spacing: 8;">
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="🔍 Búsqueda Avanzada (Todos los Campos)" />
 
@@ -47,19 +43,16 @@
                         <ColumnConstraints percentWidth="25" />
                     </columnConstraints>
 
-                    <!-- Fila 1 -->
                     <TextField fx:id="txtBuscarNombre" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                     <TextField fx:id="txtBuscarPaterno" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                     <TextField fx:id="txtBuscarMaterno" promptText="A. Materno" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                     <ComboBox fx:id="cmbBuscarCargo" maxWidth="Infinity" promptText="Cargo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-                    <!-- Fila 2 -->
                     <TextField fx:id="txtBuscarUsuario" promptText="Usuario" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                     <TextField fx:id="txtBuscarEmail" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     <TextField fx:id="txtBuscarTelefono" promptText="Teléfono" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                     <ComboBox fx:id="cmbBuscarEstatus" maxWidth="Infinity" promptText="Estatus" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-                    <!-- Fila 3 -->
                     <TextField fx:id="txtBuscarCalle" promptText="Calle" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                     <TextField fx:id="txtBuscarNumero" promptText="Num." GridPane.columnIndex="1" GridPane.rowIndex="2" />
                     <ComboBox fx:id="cmbBuscarEstado" maxWidth="Infinity" promptText="Estado" GridPane.columnIndex="2" GridPane.rowIndex="2" />
@@ -84,7 +77,6 @@
                 <Button onAction="#nuevoEmpleado" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="➕ Nuevo Empleado" />
             </HBox>
 
-            <!-- Tabla Completa -->
             <TableView fx:id="tblEmpleados" minHeight="200" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colId" prefWidth="40" text="ID" />
@@ -106,7 +98,6 @@
             </TableView>
         </VBox>
 
-        <!-- ================= DERECHA: FORMULARIO ================= -->
         <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
 
             <HBox alignment="CENTER_LEFT" spacing="10">
@@ -189,7 +180,6 @@
                 <Button onAction="#guardarEmpleado" prefWidth="150" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" text="Guardar Datos" />
             </HBox>
 
-               <!-- CAMBIO: Label de Mensaje AQUÍ ARRIBA, sin fondo por defecto -->
             <Label fx:id="lblMensaje" maxWidth="300" style="-fx-font-size: 13px;" text="" wrapText="true" />
 
         </VBox>

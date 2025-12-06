@@ -10,11 +10,9 @@ public class Libro extends ElementoConID implements Data {
     private int anio;
     private boolean activo;
 
-    // Relaciones
     private Editorial editorial;
     private List<Autor> autores;
 
-    // Auxiliar para mostrar en tabla (traído desde la vista SQL)
     private String autoresTexto;
 
     public Libro() {
@@ -23,7 +21,6 @@ public class Libro extends ElementoConID implements Data {
         this.autores = new ArrayList<>();
     }
 
-    // Getters y Setters
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
 

@@ -44,7 +44,7 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
             else sql.append(" WHERE estado='").append(e.getNombre()).append("'");
         }
 
-        sql.append(" ORDER BY estado"); // Ordenar alfabéticamente para mejor UX
+        sql.append(" ORDER BY estado");
 
         Statement stmt = null;
         ResultSet rs = null;

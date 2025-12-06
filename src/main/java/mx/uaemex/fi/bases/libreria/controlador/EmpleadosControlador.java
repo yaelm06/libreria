@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 public class EmpleadosControlador {
 
-    // --- FORMULARIO ÚNICO ---
     @FXML private TextField txtNombre, txtPaterno, txtMaterno;
     @FXML private ComboBox<String> cmbCargo;
     @FXML private TextField txtTelefono, txtEmail, txtCalle, txtNumero, txtUsuario;
@@ -39,12 +38,10 @@ public class EmpleadosControlador {
     @FXML private Label lblModo;
     @FXML private Button btnEliminar;
 
-    // --- TABLA Y BUSQUEDA ---
     @FXML private TableView<Empleado> tblEmpleados;
     @FXML private TableColumn<Empleado, Integer> colId;
     @FXML private TableColumn<Empleado, String> colNombre, colPaterno, colMaterno, colCargo, colUsuario, colEmail, colTelefono, colCalle, colNumero, colLocalidadInfo, colActivo;
 
-    // Filtros COMPLETOS
     @FXML private TextField txtBuscarNombre, txtBuscarPaterno, txtBuscarMaterno;
     @FXML private ComboBox<String> cmbBuscarCargo;
     @FXML private TextField txtBuscarUsuario, txtBuscarEmail;
@@ -55,7 +52,7 @@ public class EmpleadosControlador {
     @FXML private ComboBox<String> cmbBuscarEstatus;
 
     @FXML private Label lblTotal;
-    @FXML private Label lblMensaje; // Ahora está arriba
+    @FXML private Label lblMensaje;
 
     private ConexionBD con;
     private EmpleadosDAOPsqlImp empleadoDAO;
@@ -279,7 +276,6 @@ public class EmpleadosControlador {
             if(usuario.isEmpty()) throw new RuntimeException("Usuario obligatorio");
 
             if (empleadoSeleccionado == null) {
-                // INSERTAR
                 Empleado busqueda = new Empleado();
                 busqueda.setUsuario(usuario);
                 busqueda.setActivo(null);
@@ -305,14 +301,11 @@ public class EmpleadosControlador {
                 empleadoDAO.insertar(nuevo);
                 mostrarMensaje("Empleado registrado exitosamente.", true);
             } else {
-                // ACTUALIZAR
                 leerDatosDelFormulario(empleadoSeleccionado);
                 empleadoDAO.actualizar(empleadoSeleccionado);
                 mostrarMensaje("Empleado actualizado correctamente.", true);
             }
 
-            // NOTA: No llamamos a nuevoEmpleado(null) inmediatamente aquí para que no borre el mensaje
-            // Limpiamos campos pero mantenemos el mensaje
             txtNombre.clear(); txtPaterno.clear(); txtMaterno.clear(); txtTelefono.clear();
             txtEmail.clear(); txtCalle.clear(); txtNumero.clear(); txtUsuario.clear(); txtContra.clear();
             cmbCargo.getSelectionModel().clearSelection();
@@ -343,7 +336,6 @@ public class EmpleadosControlador {
     }
 
     private void cargarEmpleadoEnFormulario(Empleado emp) {
-        // Al cargar un empleado, limpiamos cualquier mensaje previo
         lblMensaje.setText("");
 
         empleadoSeleccionado = emp;
@@ -419,7 +411,6 @@ public class EmpleadosControlador {
                 msg = "Empleado reactivado correctamente.";
             }
 
-            // Limpiar formulario y mostrar mensaje
             limpiarFormulario();
             mostrarMensaje(msg, true);
 
@@ -468,16 +459,13 @@ public class EmpleadosControlador {
         lblModo.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
         btnEliminar.setVisible(false);
         empleadoSeleccionado = null;
-        // NOTA: No limpiamos el mensaje aquí para que persista tras la acción
     }
 
     private void mostrarMensaje(String mensaje, boolean exito) {
         lblMensaje.setText(mensaje);
         if (exito) {
-            // Verde limpio sin fondo para que no se vea una caja fea
             lblMensaje.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 13px;");
         } else {
-            // Rojo limpio
             lblMensaje.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 13px;");
         }
     }

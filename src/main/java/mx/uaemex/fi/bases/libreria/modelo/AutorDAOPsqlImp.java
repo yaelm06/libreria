@@ -28,32 +28,26 @@ public class AutorDAOPsqlImp extends AbstractSqlDAO implements AutorDAO {
         StringBuilder sql = new StringBuilder("SELECT * FROM catalogo.tautor");
         int cols = 0;
 
-        // --- CONSTRUCCIÓN DINÁMICA DE LA CONSULTA (QBE) ---
-
-        // 1. Nombre
         if(a.getNombre() != null && !a.getNombre().isEmpty()) {
             sql.append(" WHERE nombre ILIKE '%").append(a.getNombre()).append("%'");
             cols++;
         }
 
-        // 2. Apellido Paterno
         if(a.getApellidoPaterno() != null && !a.getApellidoPaterno().isEmpty()) {
             if (cols > 0) sql.append(" AND apellido_paterno ILIKE '%").append(a.getApellidoPaterno()).append("%'");
             else { sql.append(" WHERE apellido_paterno ILIKE '%").append(a.getApellidoPaterno()).append("%'"); }
             cols++;
         }
 
-        // 3. Apellido Materno
         if(a.getApellidoMaterno() != null && !a.getApellidoMaterno().isEmpty()) {
             if (cols > 0) sql.append(" AND apellido_materno ILIKE '%").append(a.getApellidoMaterno()).append("%'");
             else { sql.append(" WHERE apellido_materno ILIKE '%").append(a.getApellidoMaterno()).append("%'"); }
             cols++;
         }
 
-        // Ordenar resultados
         sql.append(" ORDER BY apellido_paterno, nombre");
 
-        System.out.println("SQL Autor: " + sql.toString()); // Debug
+        System.out.println("SQL Autor: " + sql.toString());
 
         try (Statement stmt = this.conexion.createStatement(); ResultSet rs = stmt.executeQuery(sql.toString())) {
             while (rs.next()) {

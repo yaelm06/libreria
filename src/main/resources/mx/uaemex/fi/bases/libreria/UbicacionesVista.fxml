@@ -18,7 +18,6 @@
       fx:controller="mx.uaemex.fi.bases.libreria.controlador.UbicacionesControlador"
       spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;" prefHeight="700" prefWidth="1000">
 
-    <!-- ENCABEZADO CON BOTÓN REGRESAR -->
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
         <Button text="⬅ Regresar al Menú" onAction="#regresarMenu"
                 style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
@@ -30,11 +29,9 @@
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
-        <!-- ================= PESTAÑA 1: ESTADOS ================= -->
         <Tab text="Estados">
             <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
 
-                <!-- SECCIÓN AGREGAR -->
                 <Label text="Agregar Nuevo Estado" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
                 <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
                     <Label text="Nombre:"/>
@@ -44,7 +41,6 @@
 
                 <Separator/>
 
-                <!-- SECCIÓN TABLA Y BÚSQUEDA -->
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Label text="Buscar:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
                     <TextField fx:id="txtBuscarEstado" promptText="Nombre..."/>
@@ -60,7 +56,6 @@
                     </columns>
                 </TableView>
 
-                <!-- SECCIÓN EDITAR (Abajo) -->
                 <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
                     <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
                     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -74,11 +69,9 @@
             </VBox>
         </Tab>
 
-        <!-- ================= PESTAÑA 2: MUNICIPIOS ================= -->
         <Tab text="Municipios">
             <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
 
-                <!-- SECCIÓN AGREGAR -->
                 <Label text="Agregar Nuevo Municipio" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
                 <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
                     <Label text="Estado:"/>
@@ -90,7 +83,6 @@
 
                 <Separator/>
 
-                <!-- SECCIÓN TABLA -->
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Label text="Filtrar por:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
                     <Label text="Estado:"/>
@@ -110,7 +102,6 @@
                     </columns>
                 </TableView>
 
-                <!-- SECCIÓN EDITAR -->
                 <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
                     <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
                     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -126,11 +117,9 @@
             </VBox>
         </Tab>
 
-        <!-- ================= PESTAÑA 3: LOCALIDADES ================= -->
         <Tab text="Localidades">
             <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white;">
 
-                <!-- SECCIÓN AGREGAR -->
                 <Label text="Agregar Nueva Localidad" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
                 <HBox spacing="10" alignment="BOTTOM_LEFT" style="-fx-background-color: #e8f8f5; -fx-padding: 10; -fx-background-radius: 5;">
                     <VBox spacing="2">
@@ -156,7 +145,6 @@
 
                 <Separator/>
 
-                <!-- SECCIÓN TABLA Y BÚSQUEDA -->
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Label text="Filtrar:" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;"/>
                     <VBox spacing="2">
@@ -191,7 +179,6 @@
                     </columns>
                 </TableView>
 
-                <!-- SECCIÓN EDITAR -->
                 <VBox spacing="5" style="-fx-background-color: #fef9e7; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f39c12; -fx-border-width: 0 0 0 3;">
                     <Label text="Editar Selección" style="-fx-font-weight: bold; -fx-text-fill: #d35400;"/>
                     <HBox spacing="10" alignment="BOTTOM_LEFT">

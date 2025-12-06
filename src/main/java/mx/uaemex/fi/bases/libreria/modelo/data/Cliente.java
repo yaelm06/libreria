@@ -6,14 +6,13 @@ public class Cliente extends ElementoConID implements Data {
     private String apellidoPaterno;
     private String apellidoMaterno;
     private String telefono;
-    private Boolean activo; // Boolean objeto para permitir null en filtros
+    private Boolean activo;
 
     public Cliente() {
         super();
-        this.activo = true; // Por defecto activo al crear
+        this.activo = true;
     }
 
-    // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 

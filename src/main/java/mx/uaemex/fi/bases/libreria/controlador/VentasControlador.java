@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 public class VentasControlador {
 
-    // --- PESTAÑA 1: POS ---
     @FXML private TextField txtBuscarLibro;
     @FXML private TextField txtCantidadAgregar;
     @FXML private TableView<Libro> tblCatalogoLibros;
@@ -39,9 +38,8 @@ public class VentasControlador {
     @FXML private Label lblTotalVenta;
     @FXML private Label lblMensaje;
 
-    // --- PESTAÑA 2: HISTORIAL ---
     @FXML private TextField txtHistIdVenta, txtHistCliente, txtHistEmpleado;
-    @FXML private TextField txtHistLibro; // NUEVO CAMPO
+    @FXML private TextField txtHistLibro;
     @FXML private ComboBox<String> cmbHistMetodo;
     @FXML private DatePicker dpFechaInicio, dpFechaFin;
     @FXML private TextField txtHistMinTotal, txtHistMaxTotal;
@@ -52,7 +50,6 @@ public class VentasControlador {
     @FXML private TableColumn<Venta, String> colHistFecha, colHistCliente, colHistEmpleado, colHistMetodo, colHistEstado;
     @FXML private TableColumn<Venta, Double> colHistTotal;
 
-    // --- DAOs y Modelos ---
     private ObservableList<DetalleVenta> listaCarrito = FXCollections.observableArrayList();
     private ConexionBD con;
 
@@ -127,7 +124,6 @@ public class VentasControlador {
         buscarHistorialVentas(null);
     }
 
-    // --- LÓGICA POS ---
     @FXML void buscarLibros(ActionEvent e) {
         Libro filtro = new Libro();
         filtro.setTitulo(txtBuscarLibro.getText());
@@ -240,7 +236,6 @@ public class VentasControlador {
         }
     }
 
-    // --- LÓGICA HISTORIAL ---
     @FXML void buscarHistorialVentas(ActionEvent e) {
         Venta filtro = new Venta();
         try {
@@ -256,7 +251,7 @@ public class VentasControlador {
 
         Double minT = null, maxT = null;
         Date fechaIni = null, fechaFin = null;
-        String filtroLibro = txtHistLibro.getText(); // NUEVO: LEER CAMPO LIBRO
+        String filtroLibro = txtHistLibro.getText();
 
         try {
             if(!txtHistMinTotal.getText().isEmpty()) minT = Double.parseDouble(txtHistMinTotal.getText());
@@ -265,7 +260,6 @@ public class VentasControlador {
             if(dpFechaFin.getValue() != null) fechaFin = Date.valueOf(dpFechaFin.getValue());
         } catch(Exception ex) {}
 
-        // Pasamos el nuevo filtroLibro al DAO
         ArrayList<Venta> resultados = ventaDAO.consultar(filtro, minT, maxT, fechaIni, fechaFin, filtroLibro);
         tblHistorialVentas.setItems(FXCollections.observableArrayList(resultados));
         lblTotalVentas.setText("Encontradas: " + resultados.size());
@@ -284,7 +278,6 @@ public class VentasControlador {
         buscarHistorialVentas(null);
     }
 
-    // NUEVO: Ver detalles (ticket)
     @FXML void verDetallesVenta(ActionEvent e) {
         Venta v = tblHistorialVentas.getSelectionModel().getSelectedItem();
         if (v == null) {
@@ -314,7 +307,6 @@ public class VentasControlador {
             alert.setTitle("Detalle de Venta");
             alert.setHeaderText(null);
             alert.setContentText(sb.toString());
-            // Truco para usar fuente monoespaciada en el alert si se pudiera, pero default está bien
             alert.getDialogPane().setMinWidth(400);
             alert.showAndWait();
 

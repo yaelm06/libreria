@@ -46,10 +46,8 @@ public class MenuPrincipalControlador {
         }
     }
 
-    // --- ACCIÓN BOTÓN VENTAS ---
     @FXML
     void mostrarVistaVentas(ActionEvent event) {
-        // Asegúrate de que el FXML VentasVista.fxml esté en esta ruta
         abrirVentana("/mx/uaemex/fi/bases/libreria/VentasVista.fxml", "Punto de Venta");
     }
 
@@ -81,7 +79,6 @@ public class MenuPrincipalControlador {
             Object controller = loader.getController();
             Connection connSql = this.con.obtenerConexion();
 
-            // Inyección de dependencias según el controlador
             if (controller instanceof EmpleadosControlador) {
                 ((EmpleadosControlador) controller).setConexionBD(this.con, connSql);
             } else if (controller instanceof UbicacionesControlador) {
@@ -91,7 +88,6 @@ public class MenuPrincipalControlador {
             } else if (controller instanceof InventarioControlador) {
                 ((InventarioControlador) controller).setConexionBD(this.con, connSql);
             } else if (controller instanceof VentasControlador) {
-                // CASO ESPECIAL: Ventas necesita el empleado logueado para registrar la venta
                 ((VentasControlador) controller).initData(this.con, connSql, this.empleadoLogueado);
             }
 

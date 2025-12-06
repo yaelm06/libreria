@@ -22,6 +22,6 @@ public class Autor extends ElementoConID implements Data {
 
     @Override
     public String toString() {
-        return getNombreCompleto(); // Para ListView/ComboBox
+        return getNombreCompleto();
     }
 }

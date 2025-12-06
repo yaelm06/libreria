@@ -20,11 +20,9 @@ import java.util.List;
 
 public class InventarioControlador {
 
-    // --- CONTROL DE PESTAÑAS ---
     @FXML private TabPane tabPanePrincipal;
     @FXML private Tab tabLibros, tabAutores, tabEditoriales;
 
-    // --- LIBROS: BÚSQUEDA ---
     @FXML private TextField txtBuscarTitulo, txtBuscarISBN, txtBuscarAutorLibro;
     @FXML private ComboBox<Editorial> cmbBuscarEditorial;
 
@@ -38,9 +36,8 @@ public class InventarioControlador {
     @FXML private HBox boxRangoAnio;
     @FXML private TextField txtBuscarAnioMin, txtBuscarAnioMax;
 
-    @FXML private Label lblTotalLibros; // NUEVO LABEL
+    @FXML private Label lblTotalLibros;
 
-    // --- LIBROS: TABLA Y FORMULARIO ---
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, Integer> colLibroId, colLibroAnio;
     @FXML private TableColumn<Libro, String> colLibroTitulo, colLibroISBN, colLibroAutor, colLibroEditorial;
@@ -60,7 +57,6 @@ public class InventarioControlador {
     @FXML private Label lblMensajeLibro;
     private Libro libroSeleccionado;
 
-    // --- AUTORES ---
     @FXML private TextField txtBuscarAutorNombre, txtBuscarAutorPaterno, txtBuscarAutorMaterno;
     @FXML private TableView<Autor> tblAutores;
     @FXML private TableColumn<Autor, Integer> colAutorId;
@@ -69,10 +65,9 @@ public class InventarioControlador {
     @FXML private Label lblModoAutor;
     @FXML private Label lblMensajeAutor;
     @FXML private Button btnEliminarAutor;
-    @FXML private Label lblTotalAutores; // NUEVO LABEL
+    @FXML private Label lblTotalAutores;
     private Autor autorSeleccionado;
 
-    // --- EDITORIALES ---
     @FXML private TextField txtBuscarEdiNombre, txtBuscarEdiPais;
     @FXML private TableView<Editorial> tblEditoriales;
     @FXML private TableColumn<Editorial, Integer> colEditorialId;
@@ -81,10 +76,9 @@ public class InventarioControlador {
     @FXML private Label lblModoEditorial;
     @FXML private Label lblMensajeEditorial;
     @FXML private Button btnEliminarEditorial;
-    @FXML private Label lblTotalEditoriales; // NUEVO LABEL
+    @FXML private Label lblTotalEditoriales;
     private Editorial editorialSeleccionada;
 
-    // --- DAOs ---
     private ConexionBD con;
     private LibroDAOPsqlImp libroDAO = new LibroDAOPsqlImp();
     private AutorDAOPsqlImp autorDAO = new AutorDAOPsqlImp();
@@ -106,7 +100,6 @@ public class InventarioControlador {
     }
 
     private void configurarTablas() {
-        // --- LIBROS ---
         colLibroId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colLibroTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colLibroISBN.setCellValueFactory(new PropertyValueFactory<>("isbn"));
@@ -119,7 +112,6 @@ public class InventarioControlador {
         tblLibros.getSelectionModel().selectedItemProperty().addListener((obs, old, nev) -> cargarLibroEnFormulario(nev));
         listAutoresDisponibles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // --- AUTORES ---
         colAutorId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colAutorNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colAutorPaterno.setCellValueFactory(new PropertyValueFactory<>("apellidoPaterno"));
@@ -137,7 +129,6 @@ public class InventarioControlador {
             }
         });
 
-        // --- EDITORIALES ---
         colEditorialId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colEditorialNombre.setCellValueFactory(new PropertyValueFactory<>("editorial"));
         colEditorialPais.setCellValueFactory(new PropertyValueFactory<>("pais"));
@@ -200,7 +191,6 @@ public class InventarioControlador {
         nuevaEditorial(null);
     }
 
-    // === TOGGLES ===
     @FXML void toggleRangoPrecio(ActionEvent e) {
         boolean esRango = chkRangoPrecio.isSelected();
         txtBuscarPrecioExacto.setVisible(!esRango);
@@ -213,7 +203,6 @@ public class InventarioControlador {
         boxRangoAnio.setVisible(esRango);
     }
 
-    // === GESTIÓN LIBROS ===
     @FXML void cargarLibros(ActionEvent e) {
         txtBuscarTitulo.clear(); txtBuscarISBN.clear(); txtBuscarAutorLibro.clear();
         cmbBuscarEditorial.getSelectionModel().clearSelection();
@@ -226,7 +215,7 @@ public class InventarioControlador {
 
         ArrayList<Libro> lista = libroDAO.consultar();
         tblLibros.setItems(FXCollections.observableArrayList(lista));
-        lblTotalLibros.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
+        lblTotalLibros.setText("Registros: " + lista.size());
     }
 
     @FXML void buscarLibro(ActionEvent e) {
@@ -259,7 +248,7 @@ public class InventarioControlador {
 
         ArrayList<Libro> lista = libroDAO.consultar(filtro, minP, maxP, minA, maxA, filtroAutor);
         tblLibros.setItems(FXCollections.observableArrayList(lista));
-        lblTotalLibros.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
+        lblTotalLibros.setText("Registros: " + lista.size());
     }
 
     private Double parseDoubleOrNull(String txt) {
@@ -361,12 +350,11 @@ public class InventarioControlador {
         }
     }
 
-    // === GESTIÓN AUTORES ===
     @FXML void recargarAutores(ActionEvent e) {
         txtBuscarAutorNombre.clear(); txtBuscarAutorPaterno.clear();
         ArrayList<Autor> autores = autorDAO.consultar();
         tblAutores.setItems(FXCollections.observableArrayList(autores));
-        lblTotalAutores.setText("Registros: " + autores.size()); // ACTUALIZAR LABEL
+        lblTotalAutores.setText("Registros: " + autores.size());
 
         listaAutoresFiltrada = new FilteredList<>(FXCollections.observableArrayList(autores), p -> true);
         listAutoresDisponibles.setItems(listaAutoresFiltrada);
@@ -378,7 +366,7 @@ public class InventarioControlador {
         if (!txtBuscarAutorPaterno.getText().isEmpty()) filtro.setApellidoPaterno(txtBuscarAutorPaterno.getText());
         ArrayList<Autor> lista = autorDAO.consultar(filtro);
         tblAutores.setItems(FXCollections.observableArrayList(lista));
-        lblTotalAutores.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
+        lblTotalAutores.setText("Registros: " + lista.size());
     }
 
     @FXML void nuevoAutor(ActionEvent e) {
@@ -417,12 +405,11 @@ public class InventarioControlador {
         }
     }
 
-    // === GESTIÓN EDITORIALES ===
     @FXML void recargarEditoriales(ActionEvent e) {
         txtBuscarEdiNombre.clear(); txtBuscarEdiPais.clear();
         ArrayList<Editorial> lista = editorialDAO.consultar();
         tblEditoriales.setItems(FXCollections.observableArrayList(lista));
-        lblTotalEditoriales.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
+        lblTotalEditoriales.setText("Registros: " + lista.size());
         cmbLibroEditorial.setItems(FXCollections.observableArrayList(lista));
         cmbBuscarEditorial.setItems(FXCollections.observableArrayList(lista));
     }
@@ -433,7 +420,7 @@ public class InventarioControlador {
         if (!txtBuscarEdiPais.getText().isEmpty()) filtro.setPais(txtBuscarEdiPais.getText());
         ArrayList<Editorial> lista = editorialDAO.consultar(filtro);
         tblEditoriales.setItems(FXCollections.observableArrayList(lista));
-        lblTotalEditoriales.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
+        lblTotalEditoriales.setText("Registros: " + lista.size());
     }
 
     @FXML void nuevaEditorial(ActionEvent e) {

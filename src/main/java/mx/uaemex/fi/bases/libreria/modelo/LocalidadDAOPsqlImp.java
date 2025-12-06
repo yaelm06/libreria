@@ -83,14 +83,13 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
                 loc.setLocalidad(rs.getString("localidad"));
                 loc.setCodigoPostal(rs.getString("codigo_postal"));
 
-                // --- CORRECCIÓN IMPORTANTE: LEER LOS IDs ---
                 Municipio mun = new Municipio();
-                mun.setId(rs.getInt("id_municipio")); // ¡Esto faltaba!
+                mun.setId(rs.getInt("id_municipio"));
                 mun.setNombre(rs.getString("municipio"));
                 loc.setMunicipio(mun);
 
                 Estado est = new Estado();
-                est.setId(rs.getInt("id_estado"));    // ¡Esto faltaba!
+                est.setId(rs.getInt("id_estado"));
                 est.setNombre(rs.getString("estado"));
                 loc.setEstado(est);
 

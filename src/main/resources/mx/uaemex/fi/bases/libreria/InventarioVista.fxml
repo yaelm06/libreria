@@ -23,7 +23,6 @@
       fx:controller="mx.uaemex.fi.bases.libreria.controlador.InventarioControlador"
       style="-fx-background-color: #f4f4f4;" prefWidth="1150" prefHeight="700">
 
-    <!-- ENCABEZADO -->
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
         <Button text="⬅ Regresar" onAction="#regresarMenu"
                 style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
@@ -35,17 +34,13 @@
 
     <TabPane fx:id="tabPanePrincipal" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" style="-fx-padding: 10;">
 
-        <!-- ================= PESTAÑA 1: LIBROS ================= -->
         <Tab fx:id="tabLibros" text="Libros">
             <HBox spacing="15" style="-fx-padding: 10;">
-                <!-- IZQUIERDA: TABLA Y BÚSQUEDA -->
                 <VBox spacing="10" HBox.hgrow="ALWAYS">
 
-                    <!-- PANEL DE BÚSQUEDA AVANZADA -->
                     <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
                         <Label text="Filtros de Búsqueda" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
 
-                        <!-- FILA 1: Textos -->
                         <HBox spacing="15" alignment="CENTER_LEFT">
                             <VBox spacing="2">
                                 <Label text="Título:" style="-fx-font-size: 10px;"/>
@@ -67,13 +62,10 @@
 
                         <Separator />
 
-                        <!-- FILA 2: Rangos Dinámicos y Botones -->
                         <HBox spacing="20" alignment="CENTER_LEFT">
-                            <!-- PRECIO -->
                             <HBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 5; -fx-background-radius: 3;">
                                 <CheckBox fx:id="chkRangoPrecio" text="Precio" onAction="#toggleRangoPrecio"/>
                                 <StackPane alignment="CENTER_LEFT">
-                                    <!-- CORREGIDO: promptText sin el símbolo $ al inicio -->
                                     <TextField fx:id="txtBuscarPrecioExacto" promptText="Exacto ($)" prefWidth="70"/>
                                     <HBox fx:id="boxRangoPrecio" spacing="2" visible="false">
                                         <TextField fx:id="txtBuscarPrecioMin" promptText="Min" prefWidth="50"/>
@@ -83,7 +75,6 @@
                                 </StackPane>
                             </HBox>
 
-                            <!-- AÑO -->
                             <HBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 5; -fx-background-radius: 3;">
                                 <CheckBox fx:id="chkRangoAnio" text="Año" onAction="#toggleRangoAnio"/>
                                 <StackPane alignment="CENTER_LEFT">
@@ -96,21 +87,19 @@
                                 </StackPane>
                             </HBox>
 
-                            <Region HBox.hgrow="ALWAYS"/> <!-- Ahora sí funcionará porque importamos Region -->
+                            <Region HBox.hgrow="ALWAYS"/>
                             <Label fx:id="lblTotalLibros" text="Registros: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9; -fx-padding: 5 10 0 0;"/>
                             <Button text="LIMPIAR" onAction="#cargarLibros" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px;"/>
                             <Button text="🔍 BUSCAR" onAction="#buscarLibro" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold;"/>
                         </HBox>
                     </VBox>
 
-                    <!-- HEADER TABLA + BOTÓN NUEVO -->
                     <HBox alignment="CENTER_RIGHT">
                         <Button text="+ Nuevo Libro" onAction="#nuevoLibro" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
                             <tooltip><Tooltip text="Limpiar formulario para agregar uno nuevo"/></tooltip>
                         </Button>
                     </HBox>
 
-                    <!-- TABLA LIBROS -->
                     <TableView fx:id="tblLibros" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colLibroId" text="ID" prefWidth="40"/>
@@ -125,7 +114,6 @@
                     </TableView>
                 </VBox>
 
-                <!-- DERECHA: FORMULARIO LIBROS -->
                 <VBox spacing="10" prefWidth="300" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
                     <HBox spacing="5" alignment="CENTER_LEFT">
                         <Label text="Detalles" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #2c3e50;"/>
@@ -182,7 +170,6 @@
             </HBox>
         </Tab>
 
-        <!-- ================= PESTAÑA 2: AUTORES ================= -->
         <Tab fx:id="tabAutores" text="Autores">
             <HBox spacing="15" style="-fx-padding: 10;">
                 <VBox spacing="10" HBox.hgrow="ALWAYS">
@@ -228,7 +215,6 @@
             </HBox>
         </Tab>
 
-        <!-- ================= PESTAÑA 3: EDITORIALES ================= -->
         <Tab fx:id="tabEditoriales" text="Editoriales">
             <HBox spacing="15" style="-fx-padding: 10;">
                 <VBox spacing="10" HBox.hgrow="ALWAYS">

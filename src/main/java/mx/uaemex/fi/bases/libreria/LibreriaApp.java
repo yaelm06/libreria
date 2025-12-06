@@ -14,24 +14,19 @@ import java.sql.SQLException;
 
 public class LibreriaApp extends Application {
 
-    // Guardamos la referencia a la conexión para cerrarla al final
     private ConexionBD conexionBD;
 
     @Override
     public void start(Stage stage) throws IOException {
-        // 1. Instanciar la conexión a la BD
-        // Asegúrate de que tu clase ConexionBD tenga los datos correctos
+
         this.conexionBD = new ConexionBD();
 
-        // 2. Cargar la Vista de Login
         FXMLLoader fxmlLoader = new FXMLLoader(LibreriaApp.class.getResource("LoginVista.fxml"));
         Parent root = fxmlLoader.load();
 
-        // 3. Obtener el controlador y pasarle la conexión
         LoginControlador loginCtrl = fxmlLoader.getController();
         loginCtrl.setConexionBD(this.conexionBD);
 
-        // 4. Configurar y mostrar la ventana
         Scene scene = new Scene(root);
         stage.setTitle("Sistema de Gestión de Librería - Acceso");
         stage.setScene(scene);
@@ -39,10 +34,6 @@ public class LibreriaApp extends Application {
         stage.show();
     }
 
-    /**
-     * Este método se ejecuta automáticamente cuando se cierra la aplicación.
-     * Es el lugar IDEAL para cerrar la conexión a la base de datos.
-     */
     @Override
     public void stop() throws Exception {
         System.out.println("Cerrando aplicación...");

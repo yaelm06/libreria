@@ -8,7 +8,6 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
 
     @Override
     public Empleado insertar(Empleado e) {
-        // Validación de datos mínimos
         if (e.getUsuario() == null || e.getContrasenia() == null || e.getNombre() == null) {
             throw new RuntimeException("Información insuficiente, NO es posible hacer el registro");
         }
@@ -16,7 +15,7 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
         String sql = "INSERT INTO personal.templeado (" +
                 "nombre, apellido_paterno, apellido_materno, cargo, telefono, email, " +
                 "calle, numero_calle, id_localidad, usuario, contrasenia, activo" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // No usamos RETURNING aquí para compatibilidad básica, pero consultamos después
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement pstmt = null;
         try {
@@ -35,12 +34,10 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
             pstmt.setInt(9, e.getIdLocalidad());
             pstmt.setString(10, e.getUsuario());
             pstmt.setString(11, e.getContrasenia());
-            pstmt.setBoolean(12, true); // activo = true por defecto
 
             pstmt.executeUpdate();
             System.out.println("-> Empleado insertado correctamente: " + e.getUsuario());
 
-            // Recuperar el ID generado consultando por usuario (Estrategia segura)
             ArrayList<Empleado> consultados = this.consultar(e);
             return consultados.isEmpty() ? null : consultados.get(0);
 
@@ -62,94 +59,78 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
         StringBuilder sql = new StringBuilder("SELECT * FROM personal.templeado");
         int cols = 0;
 
-        // --- Construcción Dinámica Limpia ---
-
-        // 1. ID
         if (empleado.getId() > 0) {
             sql.append(" WHERE id_empleado=").append(empleado.getId());
             cols++;
         }
 
-        // 2. Usuario
         if (empleado.getUsuario() != null && !empleado.getUsuario().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" usuario='").append(empleado.getUsuario()).append("'");
             cols++;
         }
 
-        // 3. Contraseña (Login)
         if (empleado.getContrasenia() != null && !empleado.getContrasenia().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" contrasenia='").append(empleado.getContrasenia()).append("'");
             cols++;
         }
 
-        // 4. Nombre
         if (empleado.getNombre() != null && !empleado.getNombre().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" nombre ILIKE '%").append(empleado.getNombre()).append("%'");
             cols++;
         }
 
-        // 5. Apellido Paterno
         if (empleado.getApellidoPaterno() != null && !empleado.getApellidoPaterno().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" apellido_paterno ILIKE '%").append(empleado.getApellidoPaterno()).append("%'");
             cols++;
         }
 
-        // 6. Apellido Materno
         if (empleado.getApellidoMaterno() != null && !empleado.getApellidoMaterno().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" apellido_materno ILIKE '%").append(empleado.getApellidoMaterno()).append("%'");
             cols++;
         }
 
-        // 7. Cargo
         if (empleado.getCargo() != null && !empleado.getCargo().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" cargo='").append(empleado.getCargo()).append("'");
             cols++;
         }
 
-        // 8. Email
         if (empleado.getEmail() != null && !empleado.getEmail().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" email ILIKE '%").append(empleado.getEmail()).append("%'");
             cols++;
         }
 
-        // 9. Telefono
         if (empleado.getTelefono() != null && !empleado.getTelefono().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" telefono='").append(empleado.getTelefono()).append("'");
             cols++;
         }
 
-        // 10. Calle
         if (empleado.getCalle() != null && !empleado.getCalle().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" calle ILIKE '%").append(empleado.getCalle()).append("%'");
             cols++;
         }
 
-        // 11. Numero Calle
         if (empleado.getNumeroCalle() != null && !empleado.getNumeroCalle().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" numero_calle='").append(empleado.getNumeroCalle()).append("'");
             cols++;
         }
 
-        // 12. Id Localidad
         if (empleado.getIdLocalidad() > 0) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" id_localidad=").append(empleado.getIdLocalidad());
             cols++;
         }
 
-        // 13. Activo (IMPORTANTE: Solo agregar filtro si el objeto lo especifica explícitamente)
         if (empleado.isActivo() != null) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" activo=").append(empleado.isActivo());
             cols++;
         }
 
-        // Ordenar por nombre
         sql.append(" ORDER BY nombre");
 
         Statement stmt = null;
         ResultSet resultado = null;
 
         try {
-            System.out.println("Ejecutando SQL (Consultar): " + sql.toString()); // AHORA SÍ SE VERÁ
+            System.out.println("Ejecutando SQL (Consultar): " + sql.toString());
             stmt = this.conexion.createStatement();
             resultado = stmt.executeQuery(sql.toString());
 
@@ -233,7 +214,6 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
         PreparedStatement pstmt = null;
 
         try {
-            // INTENTO 1: Borrado Físico
             System.out.println("Intentando SQL (Borrado Físico): " + sqlFisico + " [ID=" + e.getId() + "]");
             pstmt = this.conexion.prepareStatement(sqlFisico);
             pstmt.setInt(1, e.getId());
@@ -246,10 +226,9 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
             }
 
         } catch (SQLException ex) {
-            // Error 23503: Violación de llave foránea (tiene ventas)
             if ("23503".equals(ex.getSQLState())) {
                 System.out.println("-> Falló borrado físico (Tiene registros). Intentando borrado lógico...");
-                cerrar(pstmt); // Cerramos el anterior
+                cerrar(pstmt);
 
                 try {
                     System.out.println("Ejecutando SQL (Borrado Lógico): " + sqlLogico);
@@ -268,7 +247,6 @@ public class EmpleadosDAOPsqlImp extends AbstractSqlDAO implements EmpleadosDAO 
         }
     }
 
-    // Métodos auxiliares para cerrar recursos y evitar duplicidad de try-catch
     private void cerrar(Statement s) { try { if(s!=null) s.close(); } catch(Exception e){} }
     private void cerrar(Statement s, ResultSet r) { try { if(r!=null) r.close(); if(s!=null) s.close(); } catch(Exception e){} }
 }

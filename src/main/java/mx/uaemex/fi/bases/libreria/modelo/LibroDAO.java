@@ -10,7 +10,6 @@ public interface LibroDAO {
     public ArrayList<Libro> consultar();
     public ArrayList<Libro> consultar(Libro l);
 
-    // ACTUALIZADO: Agregamos filtroAutor (String)
     public ArrayList<Libro> consultar(Libro l, Double minPrecio, Double maxPrecio, Integer minAnio, Integer maxAnio, String filtroAutor);
 
     public void actualizar(Libro l);

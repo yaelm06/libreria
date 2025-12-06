@@ -16,7 +16,6 @@ public class MetodoPago extends ElementoConID {
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    // Sobreescribir toString es CRUCIAL para que el ComboBox muestre el nombre y no la referencia de memoria
     @Override
     public String toString() {
         return tipo;

@@ -77,8 +77,6 @@ public class LoginControlador {
         } catch (Exception e) {
             lblMensaje.setText("Error: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            // No cerramos conexión aquí, se pasa al siguiente controlador
         }
     }
 
@@ -93,10 +91,9 @@ public class LoginControlador {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
 
-            // --- CAMBIO CLAVE: Título y Maximizar ---
             stage.setTitle("Sistema Librería - Menú Principal");
             stage.setScene(scene);
-            stage.setMaximized(true); // Maximizar para ver todo bien
+            stage.setMaximized(true);
             stage.show();
 
         } catch (IOException e) {

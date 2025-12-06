@@ -10,9 +10,7 @@ public interface VentaDAO {
 
     public ArrayList<Venta> consultar();
 
-    // ACTUALIZADO: Agregamos filtroLibro
     public ArrayList<Venta> consultar(Venta filtro, Double minTotal, Double maxTotal, Date fechaInicio, Date fechaFin, String filtroLibro);
 
-    // NUEVO: Para el botón "Ver Detalles" (Query 6)
     public ArrayList<DetalleVenta> consultarDetalle(int idVenta);
 }

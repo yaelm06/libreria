@@ -19,6 +19,6 @@ public class Editorial extends ElementoConID implements Data {
 
     @Override
     public String toString() {
-        return editorial; // Para que se vea bien en el ComboBox
+        return editorial;
     }
 }

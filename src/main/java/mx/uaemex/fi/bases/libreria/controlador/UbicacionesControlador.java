@@ -20,9 +20,6 @@ import java.util.stream.Collectors;
 
 public class UbicacionesControlador {
 
-    // ==========================================
-    // ESTADOS
-    // ==========================================
     @FXML private TextField txtNombreEstadoAgregar;
     @FXML private TableView<Estado> tblEstados;
     @FXML private TableColumn<Estado, Integer> colIdEstado;
@@ -32,9 +29,6 @@ public class UbicacionesControlador {
     @FXML private TextField txtNombreEstadoEditar;
     @FXML private Button btnActualizarEstado, btnEliminarEstado;
 
-    // ==========================================
-    // MUNICIPIOS
-    // ==========================================
     @FXML private ComboBox<Estado> cmbEstadoMuniAgregar;
     @FXML private TextField txtNombreMuniAgregar;
     @FXML private TableView<Municipio> tblMunicipios;
@@ -109,7 +103,6 @@ public class UbicacionesControlador {
     }
 
     private void configurarTablas() {
-        // --- ESTADOS ---
         colIdEstado.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombreEstado.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 
@@ -122,7 +115,6 @@ public class UbicacionesControlador {
             }
         });
 
-        // --- MUNICIPIOS ---
         colIdMunicipio.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombreMunicipio.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colEstadoDeMunicipio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
@@ -142,21 +134,18 @@ public class UbicacionesControlador {
             }
         });
 
-        // --- LOCALIDADES ---
         colIdLocalidad.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombreLocalidad.setCellValueFactory(new PropertyValueFactory<>("localidad"));
         colCPLocalidad.setCellValueFactory(new PropertyValueFactory<>("codigoPostal"));
         colMunicipioDeLocalidad.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMunicipio().getNombre()));
         colEstadoDeLocalidad.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
 
-        // ** AQUÍ ESTÁ LA LÓGICA QUE ARREGLA TU PROBLEMA DE SELECCIÓN **
         tblLocalidades.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             localidadSeleccionada = newSel;
             if (newSel != null) {
                 txtNombreLocEditar.setText(newSel.getLocalidad());
                 txtCPLocEditar.setText(newSel.getCodigoPostal());
 
-                // 1. Seleccionar Estado (Esto disparará el filtro de municipios automáticamente)
                 if (newSel.getEstado() != null) {
                     for(Estado e : cmbEstadoLocEditar.getItems()) {
                         if(e.getId() == newSel.getEstado().getId()) {
@@ -166,8 +155,6 @@ public class UbicacionesControlador {
                     }
                 }
 
-                // 2. Seleccionar Municipio
-                // Importante: Como JavaFX es rápido, la lista de municipios ya debería estar filtrada
                 if (newSel.getMunicipio() != null) {
                     for(Municipio m : cmbMuniLocEditar.getItems()) {
                         if(m.getId() == newSel.getMunicipio().getId()) {
@@ -250,7 +237,6 @@ public class UbicacionesControlador {
         lbl.setText("Encontrados: " + cantidad);
     }
 
-    // --- VALIDACIONES ---
     private boolean existeEstado(String nombre) {
         return tblEstados.getItems().stream().anyMatch(e -> e.getNombre().equalsIgnoreCase(nombre));
     }
@@ -261,7 +247,6 @@ public class UbicacionesControlador {
         return tblLocalidades.getItems().stream().anyMatch(l -> l.getLocalidad().equalsIgnoreCase(nombre) && l.getMunicipio().getId() == idMunicipio);
     }
 
-    // ================== ESTADOS ==================
     @FXML void agregarEstado(ActionEvent e) {
         try {
             String nombre = txtNombreEstadoAgregar.getText().trim();
@@ -319,7 +304,6 @@ public class UbicacionesControlador {
         cargarDatos();
     }
 
-    // ================== MUNICIPIOS ==================
     @FXML void agregarMunicipio(ActionEvent e) {
         try {
             String nombre = txtNombreMuniAgregar.getText().trim();
@@ -385,7 +369,6 @@ public class UbicacionesControlador {
         cargarDatos();
     }
 
-    // ================== LOCALIDADES ==================
     @FXML void agregarLocalidad(ActionEvent e) {
         try {
             String nombre = txtNombreLocAgregar.getText().trim();

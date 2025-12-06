@@ -58,39 +58,32 @@ public class LibroDAOPsqlImp extends AbstractSqlDAO implements LibroDAO {
         return consultar(l, null, null, null, null, null);
     }
 
-    // --- CONSULTA AVANZADA CON TODOS LOS FILTROS ---
     @Override
     public ArrayList<Libro> consultar(Libro l, Double minPrecio, Double maxPrecio, Integer minAnio, Integer maxAnio, String filtroAutor) {
         ArrayList<Libro> lista = new ArrayList<>();
-        // Usamos la vista que ya tiene los autores concatenados
         StringBuilder sql = new StringBuilder("SELECT * FROM catalogo.vista_libros_completos");
         int cols = 0;
 
-        // 1. Título
         if (l.getTitulo() != null && !l.getTitulo().isEmpty()) {
             sql.append(" WHERE titulo ILIKE '%").append(l.getTitulo()).append("%'");
             cols++;
         }
 
-        // 2. ISBN
         if (l.getIsbn() != null && !l.getIsbn().isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" isbn LIKE '%").append(l.getIsbn()).append("%'");
             cols++;
         }
 
-        // 3. Autor (Búsqueda sobre el texto concatenado de la vista)
         if (filtroAutor != null && !filtroAutor.isEmpty()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" autores_texto ILIKE '%").append(filtroAutor).append("%'");
             cols++;
         }
 
-        // 4. Filtro Editorial (Si se seleccionó en el objeto Libro)
         if (l.getEditorial() != null && l.getEditorial().getId() > 0) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" id_editorial=").append(l.getEditorial().getId());
             cols++;
         }
 
-        // 5. Rango Precio
         if (minPrecio != null) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" precio >= ").append(minPrecio);
             cols++;
@@ -100,7 +93,6 @@ public class LibroDAOPsqlImp extends AbstractSqlDAO implements LibroDAO {
             cols++;
         }
 
-        // 6. Rango Año
         if (minAnio != null) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" anio >= ").append(minAnio);
             cols++;
@@ -110,7 +102,6 @@ public class LibroDAOPsqlImp extends AbstractSqlDAO implements LibroDAO {
             cols++;
         }
 
-        // 7. Activo
         if (l.isActivo()) {
             sql.append(cols > 0 ? " AND" : " WHERE").append(" activo=true");
         }

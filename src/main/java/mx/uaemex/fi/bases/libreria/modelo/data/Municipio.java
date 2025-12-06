@@ -1,17 +1,13 @@
 package mx.uaemex.fi.bases.libreria.modelo.data;
 
-/**
- * Representa un Municipio.
- * Mapea la tabla 'tmunicipio'.
- */
 public class Municipio extends ElementoConID implements Data {
     private String nombre;
-    private Estado estado; // Relación con el objeto Estado
+    private Estado estado;
 
     public Municipio() {
         super();
         this.nombre = null;
-        this.estado = new Estado(); // Inicializamos para evitar NullPointerException
+        this.estado = new Estado();
     }
 
     public String getNombre() {

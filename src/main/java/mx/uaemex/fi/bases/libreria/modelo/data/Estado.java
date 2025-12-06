@@ -1,9 +1,5 @@
 package mx.uaemex.fi.bases.libreria.modelo.data;
 
-/**
- * Representa un Estado de la República.
- * Mapea la tabla 'testado'.
- */
 public class Estado extends ElementoConID implements Data {
     private String nombre;
 

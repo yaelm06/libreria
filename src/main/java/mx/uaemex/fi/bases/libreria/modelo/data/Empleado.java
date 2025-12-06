@@ -14,15 +14,13 @@ public class Empleado extends ElementoConID implements Data {
     private String usuario;
     private String contrasenia;
 
-    // CAMBIO: Usamos Boolean (objeto) para permitir null en filtros
     private Boolean activo;
 
     public Empleado() {
         super();
-        this.activo = true; // Por defecto activo
+        this.activo = true;
     }
 
-    // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellidoPaterno() { return apellidoPaterno; }
@@ -46,7 +44,6 @@ public class Empleado extends ElementoConID implements Data {
     public String getContrasenia() { return contrasenia; }
     public void setContrasenia(String contrasenia) { this.contrasenia = contrasenia; }
 
-    // CAMBIO: Getters/Setters para Boolean
     public Boolean isActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
 }

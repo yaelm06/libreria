@@ -14,7 +14,6 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
                 "nombre, apellido_paterno, apellido_materno, telefono, activo" +
                 ") VALUES (?, ?, ?, ?, ?)";
 
-        // Validación mínima
         if (c.getNombre() == null || c.getApellidoPaterno() == null) {
             throw new RuntimeException("Nombre y Apellido Paterno son obligatorios.");
         }
@@ -27,7 +26,7 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
             pstmt.setString(2, c.getApellidoPaterno());
             pstmt.setString(3, c.getApellidoMaterno());
             pstmt.setString(4, c.getTelefono());
-            pstmt.setBoolean(5, true); // activo = true por defecto
+            pstmt.setBoolean(5, true);
 
             pstmt.executeUpdate();
 
@@ -37,10 +36,8 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
             cerrar(pstmt);
         }
 
-        // Recuperar el objeto insertado
         consultados = this.consultar(c);
         if (!consultados.isEmpty()) {
-            // Retornamos el último encontrado (por si hay homónimos)
             return consultados.get(consultados.size() - 1);
         } else {
             return null;
@@ -62,8 +59,6 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
 
         try {
             stmt = this.conexion.createStatement();
-
-            // --- Query By Example ---
 
             if (c.getId() > 0) {
                 sql.append(" WHERE (id_cliente=").append(c.getId());
@@ -94,7 +89,6 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
                 cols++;
             }
 
-            // Filtro Activo (Inteligente: null = todos, true/false = filtro)
             if (c.isActivo() != null) {
                 if (cols > 0) sql.append(" AND activo=").append(c.isActivo());
                 else { sql.append(" WHERE (activo=").append(c.isActivo()); }
@@ -144,7 +138,6 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
             if (c.getApellidoMaterno() != null) { if(cols>0) sql.append(","); sql.append(" apellido_materno='").append(c.getApellidoMaterno()).append("'"); cols++; }
             if (c.getTelefono() != null) { if(cols>0) sql.append(","); sql.append(" telefono='").append(c.getTelefono()).append("'"); cols++; }
 
-            // Permitir actualización explícita de activo (para reactivar)
             if (c.isActivo() != null) {
                 if(cols>0) sql.append(",");
                 sql.append(" activo=").append(c.isActivo());
@@ -181,7 +174,6 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
         String sqlLogico = "UPDATE ventas.tcliente SET activo=false WHERE id_cliente=?";
 
         try {
-            // INTENTO 1: Borrado Físico
             System.out.println("Intentando SQL (Borrado Físico Cliente): " + sqlFisico + " [ID=" + c.getId() + "]");
             pstmt = this.conexion.prepareStatement(sqlFisico);
             pstmt.setInt(1, c.getId());
@@ -194,11 +186,9 @@ public class ClientesDAOPsqlImp extends AbstractSqlDAO implements ClientesDAO {
             }
 
         } catch (SQLException ex) {
-            // Verificamos error FK (23503)
             if ("23503".equals(ex.getSQLState())) {
                 System.out.println("-> Falló borrado físico (Tiene ventas). Intentando borrado lógico...");
 
-                // INTENTO 2: Borrado Lógico
                 try (PreparedStatement pstmtLogico = this.conexion.prepareStatement(sqlLogico)) {
                     System.out.println("Ejecutando SQL (Baja Lógica Cliente): " + sqlLogico + " [ID=" + c.getId() + "]");
                     pstmtLogico.setInt(1, c.getId());

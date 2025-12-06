@@ -10,12 +10,10 @@ public class Venta extends ElementoConID implements Data {
     private Timestamp fecha;
     private boolean activo;
 
-    // Relaciones (Objetos completos para mostrar nombres en tablas)
     private Cliente cliente;
     private Empleado empleado;
-    private String metodoPago; // Puede ser objeto o String simple
+    private String metodoPago;
 
-    // Lista de detalles (para ver qué se vendió en esa venta)
     private List<DetalleVenta> detalles;
 
     public Venta() {
@@ -26,7 +24,6 @@ public class Venta extends ElementoConID implements Data {
         this.activo = true;
     }
 
-    // Getters y Setters
     public double getTotal() { return total; }
     public void setTotal(double total) { this.total = total; }
 

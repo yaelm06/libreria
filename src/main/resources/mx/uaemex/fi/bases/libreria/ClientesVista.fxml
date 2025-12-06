@@ -20,7 +20,6 @@
       fx:controller="mx.uaemex.fi.bases.libreria.controlador.ClientesControlador"
       style="-fx-background-color: #f4f4f4;">
 
-    <!-- BARRA SUPERIOR -->
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
         <Button text="⬅ Regresar al Menú" onAction="#regresarMenu"
                 style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
@@ -32,10 +31,8 @@
 
     <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
 
-        <!-- IZQUIERDA: LISTA Y FILTROS -->
         <VBox spacing="10" style="-fx-padding: 15;">
 
-            <!-- Panel Filtros -->
             <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1); -fx-spacing: 8;">
                 <Label text="🔍 Buscar Clientes" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
                 <GridPane hgap="8" vgap="8">
@@ -79,7 +76,6 @@
             </TableView>
         </VBox>
 
-        <!-- DERECHA: FORMULARIO -->
         <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label text="Detalles del Cliente" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #2c3e50;"/>
