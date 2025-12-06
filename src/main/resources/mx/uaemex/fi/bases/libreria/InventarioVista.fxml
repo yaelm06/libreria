@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="mx.uaemex.fi.bases.libreria.controlador.InventarioControlador"
+      style="-fx-background-color: #f4f4f4;" prefWidth="1150" prefHeight="700">
+
+    <!-- ENCABEZADO -->
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+        <Button text="⬅ Regresar" onAction="#regresarMenu"
+                style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
+        <Separator orientation="VERTICAL" />
+        <Label text="Inventario y Catálogo" style="-fx-text-fill: #2c3e50;">
+            <font><Font name="Segoe UI Bold" size="18.0"/></font>
+        </Label>
+    </HBox>
+
+    <TabPane fx:id="tabPanePrincipal" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" style="-fx-padding: 10;">
+
+        <!-- ================= PESTAÑA 1: LIBROS ================= -->
+        <Tab fx:id="tabLibros" text="Libros">
+            <HBox spacing="15" style="-fx-padding: 10;">
+                <!-- IZQUIERDA: TABLA Y BÚSQUEDA -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+                    <!-- PANEL DE BÚSQUEDA AVANZADA -->
+                    <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);">
+                        <Label text="Filtros de Búsqueda" style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
+
+                        <!-- FILA 1: Textos -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <VBox spacing="2">
+                                <Label text="Título:" style="-fx-font-size: 10px;"/>
+                                <TextField fx:id="txtBuscarTitulo" promptText="Buscar por título..." prefWidth="180"/>
+                            </VBox>
+                            <VBox spacing="2">
+                                <Label text="Autor:" style="-fx-font-size: 10px;"/>
+                                <TextField fx:id="txtBuscarAutorLibro" promptText="Buscar por autor..." prefWidth="150"/>
+                            </VBox>
+
+                            <!-- CORRECCIÓN: SE AGREGÓ DE VUELTA EL CAMPO ISBN -->
+                            <VBox spacing="2">
+                                <Label text="ISBN:" style="-fx-font-size: 10px;"/>
+                                <TextField fx:id="txtBuscarISBN" promptText="ISBN..." prefWidth="120"/>
+                            </VBox>
+
+                            <VBox spacing="2">
+                                <Label text="Editorial:" style="-fx-font-size: 10px;"/>
+                                <ComboBox fx:id="cmbBuscarEditorial" promptText="Todas" prefWidth="150"/>
+                            </VBox>
+                        </HBox>
+
+                        <Separator />
+
+                        <!-- FILA 2: Rangos Dinámicos y Botones -->
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <!-- PRECIO -->
+                            <HBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 5; -fx-background-radius: 3;">
+                                <CheckBox fx:id="chkRangoPrecio" text="Precio" onAction="#toggleRangoPrecio"/>
+                                <StackPane alignment="CENTER_LEFT">
+                                    <TextField fx:id="txtBuscarPrecioExacto" promptText="'$ Exacto" prefWidth="70"/>
+                                    <HBox fx:id="boxRangoPrecio" spacing="2" visible="false">
+                                        <TextField fx:id="txtBuscarPrecioMin" promptText="Min" prefWidth="50"/>
+                                        <Label text="-"/>
+                                        <TextField fx:id="txtBuscarPrecioMax" promptText="Max" prefWidth="50"/>
+                                    </HBox>
+                                </StackPane>
+                            </HBox>
+
+                            <!-- AÑO -->
+                            <HBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 5; -fx-background-radius: 3;">
+                                <CheckBox fx:id="chkRangoAnio" text="Año" onAction="#toggleRangoAnio"/>
+                                <StackPane alignment="CENTER_LEFT">
+                                    <TextField fx:id="txtBuscarAnioExacto" promptText="Año" prefWidth="60"/>
+                                    <HBox fx:id="boxRangoAnio" spacing="2" visible="false">
+                                        <TextField fx:id="txtBuscarAnioMin" promptText="De" prefWidth="45"/>
+                                        <Label text="-"/>
+                                        <TextField fx:id="txtBuscarAnioMax" promptText="A" prefWidth="45"/>
+                                    </HBox>
+                                </StackPane>
+                            </HBox>
+
+                            <VBox HBox.hgrow="ALWAYS"/>
+                            <Button text="LIMPIAR" onAction="#cargarLibros" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px;"/>
+                            <Button text="🔍 BUSCAR" onAction="#buscarLibro" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- HEADER TABLA + BOTÓN NUEVO -->
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="+ Nuevo Libro" onAction="#nuevoLibro" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;">
+                            <tooltip><Tooltip text="Limpiar formulario para agregar uno nuevo"/></tooltip>
+                        </Button>
+                    </HBox>
+
+                    <!-- TABLA LIBROS -->
+                    <TableView fx:id="tblLibros" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colLibroId" text="ID" prefWidth="40"/>
+                            <TableColumn fx:id="colLibroTitulo" text="Título" prefWidth="220"/>
+                            <TableColumn fx:id="colLibroAutor" text="Autores" prefWidth="180"/>
+                            <TableColumn fx:id="colLibroEditorial" text="Editorial" prefWidth="100"/>
+                            <TableColumn fx:id="colLibroISBN" text="ISBN" prefWidth="100"/>
+                            <TableColumn fx:id="colLibroPrecio" text="Precio" prefWidth="70"/>
+                            <TableColumn fx:id="colLibroAnio" text="Año" prefWidth="50"/>
+                            <TableColumn fx:id="colLibroActivo" text="Disp." prefWidth="50"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <!-- DERECHA: FORMULARIO LIBROS -->
+                <VBox spacing="10" prefWidth="320" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+                    <!-- TITULO DINÁMICO -->
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="Detalles" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #2c3e50;"/>
+                        <Label fx:id="lblModoLibro" text="(Nuevo)" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #27ae60;"/>
+                    </HBox>
+                    <Separator/>
+
+                    <!-- MENSAJE DE ESTADO (Visible arriba para que no se pierda) -->
+                    <Label fx:id="lblMensajeLibro" wrapText="true" minHeight="20" style="-fx-font-size: 12px;"/>
+
+                    <Label text="Título:"/>
+                    <TextField fx:id="txtLibroTitulo"/>
+
+                    <Label text="ISBN:"/>
+                    <TextField fx:id="txtLibroISBN"/>
+
+                    <HBox spacing="10">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Precio:"/>
+                            <TextField fx:id="txtLibroPrecio"/>
+                        </VBox>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Año:"/>
+                            <TextField fx:id="txtLibroAnio"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label text="Editorial:"/>
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="cmbLibroEditorial" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Button text="+" onAction="#irAGestionEditoriales" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;">
+                            <tooltip><Tooltip text="Ir a Editoriales"/></tooltip>
+                        </Button>
+                    </HBox>
+
+                    <Label text="Autores (Selección Múltiple):"/>
+                    <TextField fx:id="txtFiltroAutorForm" promptText="🔎 Buscar en lista..." style="-fx-background-color: #ecf0f1; -fx-font-size: 11px;"/>
+
+                    <HBox spacing="5" VBox.vgrow="ALWAYS">
+                        <ListView fx:id="listAutoresDisponibles" HBox.hgrow="ALWAYS"/>
+                        <VBox alignment="TOP_CENTER">
+                            <Button text="+" onAction="#irAGestionAutores" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;">
+                                <tooltip><Tooltip text="Ir a Autores"/></tooltip>
+                            </Button>
+                        </VBox>
+                    </HBox>
+
+                    <CheckBox fx:id="chkLibroActivo" text="Disponible (Activo)" selected="true"/>
+
+                    <!-- BOTONES DE ACCIÓN (INFERIORES) -->
+                    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+                        <!-- El botón Nuevo también está arriba, pero lo dejamos aquí como 'Limpiar' si se prefiere -->
+                        <Button text="Limpiar" onAction="#nuevoLibro" style="-fx-background-color: #ecf0f1;"/>
+
+                        <Button text="Guardar Datos" onAction="#guardarLibro" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <Button fx:id="btnEliminarLibro" text="Eliminar / Dar de baja" onAction="#eliminarLibro" visible="false" maxWidth="Infinity" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <!-- ================= PESTAÑA 2: AUTORES ================= -->
+        <Tab fx:id="tabAutores" text="Autores">
+            <HBox spacing="15" style="-fx-padding: 10;">
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5;">
+                        <Label text="Filtrar:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="txtBuscarAutorNombre" promptText="Nombre..." />
+                        <TextField fx:id="txtBuscarAutorPaterno" promptText="A. Paterno..." />
+                        <Button text="🔍 Buscar" onAction="#buscarAutor" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+                        <Button text="Todos" onAction="#recargarAutores"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="+ Nuevo Autor" onAction="#nuevoAutor" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <TableView fx:id="tblAutores" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colAutorId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colAutorNombre" text="Nombre" prefWidth="150"/>
+                            <TableColumn fx:id="colAutorPaterno" text="A. Paterno" prefWidth="150"/>
+                            <TableColumn fx:id="colAutorMaterno" text="A. Materno" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="10" prefWidth="280" style="-fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="Detalles" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                        <Label fx:id="lblModoAutor" text="(Nuevo)" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                    </HBox>
+                    <Separator/>
+                    <Label fx:id="lblMensajeAutor" wrapText="true" minHeight="20"/>
+
+                    <TextField fx:id="txtAutorNombre" promptText="Nombre"/>
+                    <TextField fx:id="txtAutorPaterno" promptText="Apellido Paterno"/>
+                    <TextField fx:id="txtAutorMaterno" promptText="Apellido Materno"/>
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Limpiar" onAction="#nuevoAutor"/>
+                        <Button text="Guardar" onAction="#guardarAutor" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                    </HBox>
+                    <Button fx:id="btnEliminarAutor" text="Eliminar" onAction="#eliminarAutor" visible="false" maxWidth="Infinity" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+        </Tab>
+
+        <!-- ================= PESTAÑA 3: EDITORIALES ================= -->
+        <Tab fx:id="tabEditoriales" text="Editoriales">
+            <HBox spacing="15" style="-fx-padding: 10;">
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5;">
+                        <Label text="Filtrar:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="txtBuscarEdiNombre" promptText="Nombre..." />
+                        <TextField fx:id="txtBuscarEdiPais" promptText="País..." />
+                        <Button text="🔍 Buscar" onAction="#buscarEditorial" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+                        <Button text="Todos" onAction="#recargarEditoriales"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="+ Nueva Editorial" onAction="#nuevaEditorial" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <TableView fx:id="tblEditoriales" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colEditorialId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colEditorialNombre" text="Editorial" prefWidth="250"/>
+                            <TableColumn fx:id="colEditorialPais" text="País" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="10" prefWidth="280" style="-fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="Detalles" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                        <Label fx:id="lblModoEditorial" text="(Nuevo)" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                    </HBox>
+                    <Separator/>
+                    <Label fx:id="lblMensajeEditorial" wrapText="true" minHeight="20"/>
+
+                    <TextField fx:id="txtEditorialNombre" promptText="Nombre"/>
+                    <TextField fx:id="txtEditorialPais" promptText="País"/>
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Limpiar" onAction="#nuevaEditorial"/>
+                        <Button text="Guardar" onAction="#guardarEditorial" style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                    </HBox>
+                    <Button fx:id="btnEliminarEditorial" text="Eliminar" onAction="#eliminarEditorial" visible="false" maxWidth="Infinity" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+        </Tab>
+    </TabPane>
+</VBox>

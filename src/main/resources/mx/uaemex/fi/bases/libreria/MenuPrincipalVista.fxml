@@ -58,7 +58,7 @@
                         GridPane.columnIndex="0" GridPane.rowIndex="0"
                         maxWidth="Infinity" maxHeight="Infinity"/>
 
-                <Button fx:id="btnLibros" text="📚 Inventario"
+                <Button fx:id="btnLibros" text="📚 Inventario" onAction="#mostrarVistaInventario"
                         styleClass="dashboard-button"
                         GridPane.columnIndex="1" GridPane.rowIndex="0"
                         maxWidth="Infinity" maxHeight="Infinity"/>

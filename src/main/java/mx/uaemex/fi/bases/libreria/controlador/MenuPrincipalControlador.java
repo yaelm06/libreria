@@ -66,6 +66,12 @@ public class MenuPrincipalControlador {
         abrirVentana("/mx/uaemex/fi/bases/libreria/ClientesVista.fxml", "Gestión de Clientes");
     }
 
+    @FXML
+    void mostrarVistaInventario(ActionEvent event) {
+        // Ruta: /mx/uaemex/fi/bases/libreria/ClientesVista.fxml
+        abrirVentana("/mx/uaemex/fi/bases/libreria/InventarioVista.fxml", "Gestión de Inventario");
+    }
+
     private void abrirVentana(String fxmlPath, String titulo) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -81,6 +87,9 @@ public class MenuPrincipalControlador {
             } else if (controller instanceof ClientesControlador) {
                 // Inyectar conexión al controlador de clientes
                 ((ClientesControlador) controller).setConexionBD(this.con, connSql);
+            }else if (controller instanceof InventarioControlador) {
+                // Inyectar conexión al controlador de inventario
+                ((InventarioControlador) controller).setConexionBD(this.con, connSql);
             }
 
             Stage stage = new Stage();
