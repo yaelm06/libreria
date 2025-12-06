@@ -138,7 +138,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>mx.uaemex.fi.bases.libreria/mx.uaemex.fi.bases.libreria.HelloApplication
+                            <mainClass>mx.uaemex.fi.bases.libreria/mx.uaemex.fi.bases.libreria.Launcher
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
