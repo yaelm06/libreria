@@ -60,13 +60,17 @@ public class MenuPrincipalControlador {
         abrirVentana("/mx/uaemex/fi/bases/libreria/UbicacionesVista.fxml", "Gestión de Ubicaciones");
     }
 
-    // Método genérico para abrir ventanas y manejar la conexión
+    @FXML
+    void mostrarVistaClientes(ActionEvent event) {
+        // Ruta: /mx/uaemex/fi/bases/libreria/ClientesVista.fxml
+        abrirVentana("/mx/uaemex/fi/bases/libreria/ClientesVista.fxml", "Gestión de Clientes");
+    }
+
     private void abrirVentana(String fxmlPath, String titulo) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            // Inyección de dependencias manual (polimorfismo simple)
             Object controller = loader.getController();
             Connection connSql = this.con.obtenerConexion();
 
@@ -74,17 +78,19 @@ public class MenuPrincipalControlador {
                 ((EmpleadosControlador) controller).setConexionBD(this.con, connSql);
             } else if (controller instanceof UbicacionesControlador) {
                 ((UbicacionesControlador) controller).setConexionBD(this.con, connSql);
+            } else if (controller instanceof ClientesControlador) {
+                // Inyectar conexión al controlador de clientes
+                ((ClientesControlador) controller).setConexionBD(this.con, connSql);
             }
 
             Stage stage = new Stage();
             stage.setTitle(titulo);
             stage.setScene(new Scene(root));
-            stage.setMaximized(true); // Pantalla completa para aprovechar espacio
+            stage.setMaximized(true);
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error al cargar ventana: " + fxmlPath + " -> " + e.getMessage());
         }
     }
 

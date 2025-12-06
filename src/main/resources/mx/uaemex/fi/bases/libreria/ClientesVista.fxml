@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="mx.uaemex.fi.bases.libreria.controlador.ClientesControlador"
+      style="-fx-background-color: #f4f4f4;">
+
+    <!-- BARRA SUPERIOR -->
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+        <Button text="⬅ Regresar al Menú" onAction="#regresarMenu"
+                style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
+        <Separator orientation="VERTICAL" />
+        <Label text="Gestión de Clientes" style="-fx-text-fill: #2c3e50;">
+            <font><Font name="Segoe UI Bold" size="18.0"/></font>
+        </Label>
+    </HBox>
+
+    <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+
+        <!-- IZQUIERDA: LISTA Y FILTROS -->
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+            <!-- Panel Filtros -->
+            <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1); -fx-spacing: 8;">
+                <Label text="🔍 Buscar Clientes" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+                <GridPane hgap="8" vgap="8">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33"/>
+                        <ColumnConstraints percentWidth="33"/>
+                        <ColumnConstraints percentWidth="33"/>
+                    </columnConstraints>
+
+                    <TextField fx:id="txtBuscarNombre" promptText="Nombre" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtBuscarPaterno" promptText="A. Paterno" GridPane.columnIndex="1"/>
+                    <TextField fx:id="txtBuscarMaterno" promptText="A. Materno" GridPane.columnIndex="2"/>
+
+                    <TextField fx:id="txtBuscarTelefono" promptText="Teléfono" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="cmbBuscarEstatus" promptText="Estatus" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <Button text="Limpiar" onAction="#cargarClientes" style="-fx-background-color: #ecf0f1; -fx-text-fill: #7f8c8d;"/>
+                    <Button text="Buscar" onAction="#buscarCliente" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="lblTotal" text="Registros: 0" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-font-size: 12;"/>
+                <VBox HBox.hgrow="ALWAYS"/>
+                <Button text="➕ Nuevo Cliente" onAction="#nuevoCliente" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <TableView fx:id="tblClientes" VBox.vgrow="ALWAYS" tableMenuButtonVisible="true">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="120"/>
+                    <TableColumn fx:id="colPaterno" text="A. Paterno" prefWidth="120"/>
+                    <TableColumn fx:id="colMaterno" text="A. Materno" prefWidth="120"/>
+                    <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="100"/>
+                    <TableColumn fx:id="colActivo" text="Activo" prefWidth="60"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+        <!-- DERECHA: FORMULARIO -->
+        <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Detalles del Cliente" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #2c3e50;"/>
+                <Label fx:id="lblModo" text="(Nuevo)" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;"/>
+            </HBox>
+            <Separator/>
+
+            <VBox spacing="12">
+                <Label text="Datos Personales" style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;"/>
+                <GridPane hgap="10" vgap="10">
+                    <TextField fx:id="txtNombre" promptText="Nombre" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtPaterno" promptText="A. Paterno" GridPane.columnIndex="1"/>
+                    <TextField fx:id="txtMaterno" promptText="A. Materno" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtTelefono" promptText="Teléfono" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+
+                <CheckBox fx:id="chkActivo" text="Cliente Activo" selected="true" style="-fx-padding: 10 0 0 0;"/>
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS"/>
+            <Separator/>
+
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="btnEliminar" text="Eliminar / Dar de Baja" onAction="#eliminarOReactivar"
+                        visible="false" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                <Button text="Guardar Datos" onAction="#guardarCliente"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" prefWidth="150"/>
+            </HBox>
+
+            <Label fx:id="lblMensaje" maxWidth="300" style="-fx-font-size: 13px;" text="" wrapText="true" />
+        </VBox>
+
+    </SplitPane>
+</VBox>

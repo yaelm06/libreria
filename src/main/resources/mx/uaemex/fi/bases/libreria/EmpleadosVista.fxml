@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.bases.libreria.controlador.EmpleadosControlador">
+<VBox prefHeight="600" prefWidth="1000" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.bases.libreria.controlador.EmpleadosControlador">
 
     <!-- BARRA SUPERIOR -->
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
@@ -29,13 +29,13 @@
         </Label>
     </HBox>
 
-    <!-- CONTENIDO PRINCIPAL (SPLIT) -->
-    <SplitPane dividerPositions="0.6" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+    <!-- CONTENIDO PRINCIPAL -->
+    <SplitPane dividerPositions="0.6" style="-fx-background-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS">
 
         <!-- ================= IZQUIERDA: LISTA Y FILTROS ================= -->
-        <VBox spacing="10" style="-fx-padding: 15;">
+        <VBox spacing="10">
 
-            <!-- Panel de Búsqueda Avanzada (TODOS LOS CAMPOS) -->
+            <!-- Panel de Búsqueda -->
             <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1); -fx-spacing: 8;">
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="🔍 Búsqueda Avanzada (Todos los Campos)" />
 
@@ -47,22 +47,21 @@
                         <ColumnConstraints percentWidth="25" />
                     </columnConstraints>
 
-                    <!-- Fila 1: Identidad -->
+                    <!-- Fila 1 -->
                     <TextField fx:id="txtBuscarNombre" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                     <TextField fx:id="txtBuscarPaterno" promptText="A. Paterno" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                     <TextField fx:id="txtBuscarMaterno" promptText="A. Materno" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                     <ComboBox fx:id="cmbBuscarCargo" maxWidth="Infinity" promptText="Cargo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-                    <!-- Fila 2: Cuenta y Contacto -->
+                    <!-- Fila 2 -->
                     <TextField fx:id="txtBuscarUsuario" promptText="Usuario" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                     <TextField fx:id="txtBuscarEmail" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     <TextField fx:id="txtBuscarTelefono" promptText="Teléfono" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                     <ComboBox fx:id="cmbBuscarEstatus" maxWidth="Infinity" promptText="Estatus" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-                    <!-- Fila 3: Dirección -->
+                    <!-- Fila 3 -->
                     <TextField fx:id="txtBuscarCalle" promptText="Calle" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                     <TextField fx:id="txtBuscarNumero" promptText="Num." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <!-- Filtros de Ubicación en Cascada -->
                     <ComboBox fx:id="cmbBuscarEstado" maxWidth="Infinity" promptText="Estado" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                     <ComboBox fx:id="cmbBuscarMuni" maxWidth="Infinity" promptText="Municipio" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                <rowConstraints>
@@ -80,13 +79,13 @@
             </VBox>
 
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label fx:id="lblTotal" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12; -fx-font-weight: bold;" text="Registros: 0" textFill="#2000f2" />
+                <Label fx:id="lblTotal" style="-fx-text-fill: #2980b9; -fx-font-size: 12; -fx-font-weight: bold;" text="Registros: 0" />
                 <VBox HBox.hgrow="ALWAYS" />
                 <Button onAction="#nuevoEmpleado" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="➕ Nuevo Empleado" />
             </HBox>
 
-            <!-- Tabla Completa (Con Scroll Horizontal Automático activado por columnas anchas) -->
-            <TableView fx:id="tblEmpleados" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+            <!-- Tabla Completa -->
+            <TableView fx:id="tblEmpleados" minHeight="200" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colId" prefWidth="40" text="ID" />
                     <TableColumn fx:id="colNombre" prefWidth="100" text="Nombre" />
@@ -98,10 +97,9 @@
                     <TableColumn fx:id="colTelefono" prefWidth="90" text="Teléfono" />
                     <TableColumn fx:id="colCalle" prefWidth="100" text="Calle" />
                     <TableColumn fx:id="colNumero" prefWidth="50" text="Num" />
-                    <TableColumn fx:id="colLocalidadInfo" prefWidth="250" text="Ubicación (Loc, Mun, Est)" />
+                    <TableColumn fx:id="colLocalidadInfo" prefWidth="250" text="Ubicación" />
                     <TableColumn fx:id="colActivo" prefWidth="60" text="Activo" />
                 </columns>
-                <!-- UNCONSTRAINED permite que aparezca el scroll horizontal si las columnas no caben -->
                 <columnResizePolicy>
                     <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
@@ -119,7 +117,6 @@
             <Separator />
 
             <VBox spacing="12">
-                <!-- Datos Personales -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Información Personal" />
                 <GridPane hgap="10" vgap="10">
                     <TextField fx:id="txtNombre" promptText="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" HBox.hgrow="ALWAYS" />
@@ -136,7 +133,6 @@
                </rowConstraints>
                 </GridPane>
 
-                <!-- Contacto -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Contacto y Dirección" />
                 <GridPane hgap="10" vgap="10">
                     <TextField fx:id="txtTelefono" promptText="Teléfono" GridPane.columnIndex="0" GridPane.rowIndex="0" />
@@ -153,12 +149,11 @@
                </rowConstraints>
                 </GridPane>
 
-                <!-- Ubicación -->
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Ubicación Geográfica" />
                     <Button onAction="#abrirGestionUbicaciones" style="-fx-font-size: 10px; -fx-background-color: #ecf0f1; -fx-cursor: hand;" text="Gestionar..." />
                     <Button onAction="#recargarListasUbicacion" style="-fx-font-size: 10px;" text="⟳">
-                        <tooltip><javafx.scene.control.Tooltip text="Recargar listas" /></tooltip>
+                        <tooltip><Tooltip text="Recargar listas" /></tooltip>
                     </Button>
                 </HBox>
 
@@ -168,12 +163,10 @@
                     <ComboBox fx:id="cmbLocalidad" disable="true" maxWidth="Infinity" promptText="3. Localidad" />
                 </VBox>
 
-                <!-- Login y Estatus -->
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-font-size: 12px;" text="Credenciales y Estatus" />
                 <GridPane hgap="10" vgap="10">
                     <TextField fx:id="txtUsuario" promptText="Usuario" GridPane.columnIndex="0" />
                     <PasswordField fx:id="txtContra" promptText="Contraseña" GridPane.columnIndex="1" />
-                    <!-- CHECKBOX DE ACTIVO -->
                     <CheckBox fx:id="chkActivo" selected="true" text="Usuario Activo (Acceso permitido)" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                <columnConstraints>
                   <ColumnConstraints />
@@ -191,14 +184,13 @@
             <Separator />
 
             <HBox alignment="CENTER_RIGHT" spacing="10">
-                <!-- Botón con el nombre actualizado -->
                 <Button fx:id="btnEliminar" onAction="#eliminarOReactivarEmpleado" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Eliminar / Dar de Baja" visible="false" />
 
                 <Button onAction="#guardarEmpleado" prefWidth="150" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" text="Guardar Datos" />
             </HBox>
 
-            <!-- Label para Mensajes -->
-            <Label fx:id="lblMensaje" minHeight="40" textFill="blue" wrapText="true" />
+               <!-- CAMBIO: Label de Mensaje AQUÍ ARRIBA, sin fondo por defecto -->
+            <Label fx:id="lblMensaje" maxWidth="300" style="-fx-font-size: 13px;" text="" wrapText="true" />
 
         </VBox>
 

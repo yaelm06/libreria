@@ -63,7 +63,7 @@
                         GridPane.columnIndex="1" GridPane.rowIndex="0"
                         maxWidth="Infinity" maxHeight="Infinity"/>
 
-                <Button fx:id="btnClientes" text="👥 Clientes"
+                <Button fx:id="btnClientes" text="👥 Clientes" onAction="#mostrarVistaClientes"
                         styleClass="dashboard-button"
                         GridPane.columnIndex="2" GridPane.rowIndex="0"
                         maxWidth="Infinity" maxHeight="Infinity"/>

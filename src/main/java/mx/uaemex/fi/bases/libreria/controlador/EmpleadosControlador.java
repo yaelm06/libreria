@@ -41,7 +41,6 @@ public class EmpleadosControlador {
 
     // --- TABLA Y BUSQUEDA ---
     @FXML private TableView<Empleado> tblEmpleados;
-    // Columnas COMPLETAS
     @FXML private TableColumn<Empleado, Integer> colId;
     @FXML private TableColumn<Empleado, String> colNombre, colPaterno, colMaterno, colCargo, colUsuario, colEmail, colTelefono, colCalle, colNumero, colLocalidadInfo, colActivo;
 
@@ -56,7 +55,7 @@ public class EmpleadosControlador {
     @FXML private ComboBox<String> cmbBuscarEstatus;
 
     @FXML private Label lblTotal;
-    @FXML private Label lblMensaje;
+    @FXML private Label lblMensaje; // Ahora está arriba
 
     private ConexionBD con;
     private EmpleadosDAOPsqlImp empleadoDAO;
@@ -94,7 +93,6 @@ public class EmpleadosControlador {
     }
 
     private void configurarTabla() {
-        // Mapeo de TODAS las columnas
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colPaterno.setCellValueFactory(new PropertyValueFactory<>("apellidoPaterno"));
@@ -127,11 +125,9 @@ public class EmpleadosControlador {
     }
 
     private void configurarCascadas() {
-        // Cascada Formulario
         cmbEstado.setOnAction(e -> filtrarMunicipios(cmbEstado, cmbMuni, cmbLocalidad));
         cmbMuni.setOnAction(e -> filtrarLocalidades(cmbMuni, cmbLocalidad));
 
-        // Cascada Búsqueda
         cmbBuscarEstado.setOnAction(e -> filtrarMunicipios(cmbBuscarEstado, cmbBuscarMuni, cmbBuscarLocalidad));
         cmbBuscarMuni.setOnAction(e -> filtrarLocalidades(cmbBuscarMuni, cmbBuscarLocalidad));
     }
@@ -190,7 +186,6 @@ public class EmpleadosControlador {
             cmbEstado.setItems(obsEstados);
             cmbBuscarEstado.setItems(obsEstados);
 
-            // Inicializar combos búsqueda limpios
             cmbBuscarMuni.setItems(FXCollections.observableArrayList());
             cmbBuscarLocalidad.setItems(FXCollections.observableArrayList());
 
@@ -238,7 +233,6 @@ public class EmpleadosControlador {
 
         ArrayList<Empleado> res = empleadoDAO.consultar(filtro);
 
-        // Filtro de Ubicación (Cascada en Memoria)
         if (cmbBuscarLocalidad.getValue() != null) {
             int idLoc = cmbBuscarLocalidad.getValue().getId();
             res = res.stream().filter(emp -> emp.getIdLocalidad() == idLoc).collect(Collectors.toCollection(ArrayList::new));
@@ -264,7 +258,6 @@ public class EmpleadosControlador {
         lblTotal.setText("Registros: " + res.size());
     }
 
-    // --- BOTÓN "NUEVO EMPLEADO" ---
     @FXML
     void nuevoEmpleado(ActionEvent e) {
         limpiarFormulario();
@@ -277,7 +270,6 @@ public class EmpleadosControlador {
         lblMensaje.setText("");
     }
 
-    // --- BOTÓN "GUARDAR DATOS" (Insert o Update) ---
     @FXML
     void guardarEmpleado(ActionEvent e) {
         try {
@@ -286,8 +278,8 @@ public class EmpleadosControlador {
             String usuario = txtUsuario.getText().trim();
             if(usuario.isEmpty()) throw new RuntimeException("Usuario obligatorio");
 
-            // INSERTAR
             if (empleadoSeleccionado == null) {
+                // INSERTAR
                 Empleado busqueda = new Empleado();
                 busqueda.setUsuario(usuario);
                 busqueda.setActivo(null);
@@ -298,7 +290,6 @@ public class EmpleadosControlador {
                     if (Boolean.TRUE.equals(existente.isActivo())) {
                         throw new RuntimeException("El usuario '" + usuario + "' ya existe.");
                     } else {
-                        // Reactivar
                         leerDatosDelFormulario(existente);
                         existente.setActivo(true);
                         empleadoDAO.actualizar(existente);
@@ -313,19 +304,26 @@ public class EmpleadosControlador {
                 leerDatosDelFormulario(nuevo);
                 empleadoDAO.insertar(nuevo);
                 mostrarMensaje("Empleado registrado exitosamente.", true);
-            }
-            // ACTUALIZAR
-            else {
+            } else {
+                // ACTUALIZAR
                 leerDatosDelFormulario(empleadoSeleccionado);
                 empleadoDAO.actualizar(empleadoSeleccionado);
                 mostrarMensaje("Empleado actualizado correctamente.", true);
             }
 
-            nuevoEmpleado(null);
+            // NOTA: No llamamos a nuevoEmpleado(null) inmediatamente aquí para que no borre el mensaje
+            // Limpiamos campos pero mantenemos el mensaje
+            txtNombre.clear(); txtPaterno.clear(); txtMaterno.clear(); txtTelefono.clear();
+            txtEmail.clear(); txtCalle.clear(); txtNumero.clear(); txtUsuario.clear(); txtContra.clear();
+            cmbCargo.getSelectionModel().clearSelection();
+            cmbEstado.getSelectionModel().clearSelection();
+            cmbMuni.setDisable(true); cmbLocalidad.setDisable(true);
+            empleadoSeleccionado = null;
+
             buscarEmpleado(null);
 
         } catch (Exception ex) {
-            mostrarMensaje("No se pudo completar la acción: " + ex.getMessage(), false);
+            mostrarMensaje("Error: " + ex.getMessage(), false);
         }
     }
 
@@ -345,6 +343,9 @@ public class EmpleadosControlador {
     }
 
     private void cargarEmpleadoEnFormulario(Empleado emp) {
+        // Al cargar un empleado, limpiamos cualquier mensaje previo
+        lblMensaje.setText("");
+
         empleadoSeleccionado = emp;
         lblModo.setText("(Editando ID: " + emp.getId() + ")");
         lblModo.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
@@ -394,7 +395,6 @@ public class EmpleadosControlador {
         }
 
         btnEliminar.setVisible(true);
-        // CAMBIO DE TEXTO DEL BOTÓN
         btnEliminar.setText("Eliminar / Dar de Baja");
         if (Boolean.TRUE.equals(emp.isActivo())) {
             btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
@@ -409,16 +409,20 @@ public class EmpleadosControlador {
         try {
             if(empleadoSeleccionado == null) return;
 
+            String msg = "";
             if (Boolean.TRUE.equals(empleadoSeleccionado.isActivo())) {
                 empleadoDAO.borrar(empleadoSeleccionado);
-                mostrarMensaje("Se ha inactivado al empleado correctamente.", true);
+                msg = "Se ha inactivado al empleado correctamente.";
             } else {
                 empleadoSeleccionado.setActivo(true);
                 empleadoDAO.actualizar(empleadoSeleccionado);
-                mostrarMensaje("Empleado reactivado correctamente.", true);
+                msg = "Empleado reactivado correctamente.";
             }
 
-            nuevoEmpleado(null);
+            // Limpiar formulario y mostrar mensaje
+            limpiarFormulario();
+            mostrarMensaje(msg, true);
+
             buscarEmpleado(null);
         } catch (Exception ex) {
             mostrarMensaje("No se pudo eliminar/reactivar: " + ex.getMessage(), false);
@@ -459,18 +463,22 @@ public class EmpleadosControlador {
         cmbMuni.setDisable(true);
         cmbLocalidad.setDisable(true);
         chkActivo.setSelected(true);
-        lblMensaje.setText("");
+
+        lblModo.setText("(Nuevo)");
+        lblModo.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+        btnEliminar.setVisible(false);
+        empleadoSeleccionado = null;
+        // NOTA: No limpiamos el mensaje aquí para que persista tras la acción
     }
 
-    // Método auxiliar para mensajes con estilo visible
     private void mostrarMensaje(String mensaje, boolean exito) {
         lblMensaje.setText(mensaje);
         if (exito) {
-            // Estilo para éxito (Verde fuerte, negrita, tamaño grande)
-            lblMensaje.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 16px; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);");
+            // Verde limpio sin fondo para que no se vea una caja fea
+            lblMensaje.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 13px;");
         } else {
-            // Estilo para error (Rojo fuerte, negrita, tamaño grande)
-            lblMensaje.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 16px; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);");
+            // Rojo limpio
+            lblMensaje.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 13px;");
         }
     }
 }
