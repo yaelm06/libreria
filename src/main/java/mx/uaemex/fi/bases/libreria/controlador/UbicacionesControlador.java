@@ -5,6 +5,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import mx.uaemex.fi.bases.libreria.modelo.*;
@@ -21,28 +23,20 @@ public class UbicacionesControlador {
     // ==========================================
     // ESTADOS
     // ==========================================
-    // Agregar
     @FXML private TextField txtNombreEstadoAgregar;
-
-    // Tabla y Busqueda
     @FXML private TableView<Estado> tblEstados;
     @FXML private TableColumn<Estado, Integer> colIdEstado;
     @FXML private TableColumn<Estado, String> colNombreEstado;
     @FXML private TextField txtBuscarEstado;
     @FXML private Label lblTotalEstados;
-
-    // Editar
     @FXML private TextField txtNombreEstadoEditar;
     @FXML private Button btnActualizarEstado, btnEliminarEstado;
 
     // ==========================================
     // MUNICIPIOS
     // ==========================================
-    // Agregar
     @FXML private ComboBox<Estado> cmbEstadoMuniAgregar;
     @FXML private TextField txtNombreMuniAgregar;
-
-    // Tabla y Busqueda
     @FXML private TableView<Municipio> tblMunicipios;
     @FXML private TableColumn<Municipio, Integer> colIdMunicipio;
     @FXML private TableColumn<Municipio, String> colNombreMunicipio;
@@ -50,8 +44,6 @@ public class UbicacionesControlador {
     @FXML private TextField txtBuscarMunicipio;
     @FXML private ComboBox<Estado> cmbBuscarEstadoMuni;
     @FXML private Label lblTotalMunicipios;
-
-    // Editar
     @FXML private ComboBox<Estado> cmbEstadoMuniEditar;
     @FXML private TextField txtNombreMuniEditar;
     @FXML private Button btnActualizarMunicipio, btnEliminarMunicipio;
@@ -59,13 +51,11 @@ public class UbicacionesControlador {
     // ==========================================
     // LOCALIDADES
     // ==========================================
-    // Agregar
     @FXML private ComboBox<Estado> cmbEstadoLocAgregar;
     @FXML private ComboBox<Municipio> cmbMuniLocAgregar;
     @FXML private TextField txtNombreLocAgregar;
     @FXML private TextField txtCPLocAgregar;
 
-    // Tabla y Busqueda
     @FXML private TableView<Localidad> tblLocalidades;
     @FXML private TableColumn<Localidad, Integer> colIdLocalidad;
     @FXML private TableColumn<Localidad, String> colNombreLocalidad;
@@ -77,7 +67,6 @@ public class UbicacionesControlador {
     @FXML private TextField txtBuscarLocalidad;
     @FXML private Label lblTotalLocalidades;
 
-    // Editar
     @FXML private ComboBox<Estado> cmbEstadoLocEditar;
     @FXML private ComboBox<Municipio> cmbMuniLocEditar;
     @FXML private TextField txtNombreLocEditar;
@@ -86,7 +75,6 @@ public class UbicacionesControlador {
 
     @FXML private Label lblMensaje;
 
-    // --- DAOs ---
     private ConexionBD con;
     private EstadoDAOPsqlImp estadoDAO;
     private MunicipioDAOPsqlImp municipioDAO;
@@ -115,6 +103,11 @@ public class UbicacionesControlador {
         cargarDatos();
     }
 
+    @FXML
+    void regresarMenu(ActionEvent event) {
+        ((Stage)((Node)event.getSource()).getScene().getWindow()).close();
+    }
+
     private void configurarTablas() {
         // --- ESTADOS ---
         colIdEstado.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -123,7 +116,6 @@ public class UbicacionesControlador {
         tblEstados.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             estadoSeleccionado = newSel;
             if (newSel != null) {
-                // Llenar campos de EDICIÓN (abajo)
                 txtNombreEstadoEditar.setText(newSel.getNombre());
                 btnActualizarEstado.setDisable(false);
                 btnEliminarEstado.setDisable(false);
@@ -133,15 +125,12 @@ public class UbicacionesControlador {
         // --- MUNICIPIOS ---
         colIdMunicipio.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombreMunicipio.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colEstadoDeMunicipio.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
+        colEstadoDeMunicipio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
 
         tblMunicipios.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             municipioSeleccionado = newSel;
             if (newSel != null) {
-                // Llenar campos de EDICIÓN (abajo)
                 txtNombreMuniEditar.setText(newSel.getNombre());
-
                 for(Estado e : cmbEstadoMuniEditar.getItems()) {
                     if(e.getId() == newSel.getEstado().getId()) {
                         cmbEstadoMuniEditar.setValue(e);
@@ -157,31 +146,34 @@ public class UbicacionesControlador {
         colIdLocalidad.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombreLocalidad.setCellValueFactory(new PropertyValueFactory<>("localidad"));
         colCPLocalidad.setCellValueFactory(new PropertyValueFactory<>("codigoPostal"));
-        colMunicipioDeLocalidad.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getMunicipio().getNombre()));
-        colEstadoDeLocalidad.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
+        colMunicipioDeLocalidad.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMunicipio().getNombre()));
+        colEstadoDeLocalidad.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstado().getNombre()));
 
+        // ** AQUÍ ESTÁ LA LÓGICA QUE ARREGLA TU PROBLEMA DE SELECCIÓN **
         tblLocalidades.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             localidadSeleccionada = newSel;
             if (newSel != null) {
-                // Llenar campos de EDICIÓN (abajo)
                 txtNombreLocEditar.setText(newSel.getLocalidad());
                 txtCPLocEditar.setText(newSel.getCodigoPostal());
 
-                // Seleccionar Estado (dispara filtro de municipios)
-                for(Estado e : cmbEstadoLocEditar.getItems()) {
-                    if(e.getId() == newSel.getEstado().getId()) {
-                        cmbEstadoLocEditar.setValue(e);
-                        break;
+                // 1. Seleccionar Estado (Esto disparará el filtro de municipios automáticamente)
+                if (newSel.getEstado() != null) {
+                    for(Estado e : cmbEstadoLocEditar.getItems()) {
+                        if(e.getId() == newSel.getEstado().getId()) {
+                            cmbEstadoLocEditar.setValue(e);
+                            break;
+                        }
                     }
                 }
 
-                // Seleccionar Municipio (en la lista ya filtrada)
-                for(Municipio m : cmbMuniLocEditar.getItems()) {
-                    if(m.getId() == newSel.getMunicipio().getId()) {
-                        cmbMuniLocEditar.setValue(m);
-                        break;
+                // 2. Seleccionar Municipio
+                // Importante: Como JavaFX es rápido, la lista de municipios ya debería estar filtrada
+                if (newSel.getMunicipio() != null) {
+                    for(Municipio m : cmbMuniLocEditar.getItems()) {
+                        if(m.getId() == newSel.getMunicipio().getId()) {
+                            cmbMuniLocEditar.setValue(m);
+                            break;
+                        }
                     }
                 }
 
@@ -192,13 +184,9 @@ public class UbicacionesControlador {
     }
 
     private void configurarListenersLogica() {
-        // --- AGREGAR Localidad (Cascada) ---
         cmbEstadoLocAgregar.setOnAction(e -> filtrarMunicipios(cmbEstadoLocAgregar, cmbMuniLocAgregar));
-
-        // --- EDITAR Localidad (Cascada) ---
         cmbEstadoLocEditar.setOnAction(e -> filtrarMunicipios(cmbEstadoLocEditar, cmbMuniLocEditar));
 
-        // --- BÚSQUEDA Localidad (Cascada) ---
         cmbBuscarEstadoLoc.setOnAction(e -> {
             Estado est = cmbBuscarEstadoLoc.getValue();
             if(est != null) {
@@ -213,7 +201,6 @@ public class UbicacionesControlador {
         });
     }
 
-    // Método auxiliar para no repetir código de filtrado
     private void filtrarMunicipios(ComboBox<Estado> comboEstado, ComboBox<Municipio> comboMuni) {
         Estado est = comboEstado.getValue();
         if(est != null) {
@@ -244,17 +231,14 @@ public class UbicacionesControlador {
 
             ObservableList<Estado> obsEstados = FXCollections.observableArrayList(estados);
 
-            // Combos AGREGAR
             cmbEstadoMuniAgregar.setItems(obsEstados);
             cmbEstadoLocAgregar.setItems(obsEstados);
             cmbMuniLocAgregar.setDisable(true);
 
-            // Combos EDITAR
             cmbEstadoMuniEditar.setItems(obsEstados);
             cmbEstadoLocEditar.setItems(obsEstados);
             cmbMuniLocEditar.setDisable(true);
 
-            // Combos BÚSQUEDA
             cmbBuscarEstadoMuni.setItems(obsEstados);
             cmbBuscarEstadoLoc.setItems(obsEstados);
             cmbBuscarMunicipioLoc.setItems(FXCollections.observableArrayList(todosMunicipios));
@@ -287,7 +271,7 @@ public class UbicacionesControlador {
             Estado nuevo = new Estado(0, nombre);
             estadoDAO.insertar(nuevo);
             lblMensaje.setText("Estado agregado.");
-            txtNombreEstadoAgregar.clear(); // Limpiar solo el campo de agregar
+            txtNombreEstadoAgregar.clear();
             cargarDatos();
         } catch (Exception ex) { lblMensaje.setText("Error: " + ex.getMessage()); }
     }
@@ -458,7 +442,6 @@ public class UbicacionesControlador {
 
     @FXML void buscarLocalidad(ActionEvent e) {
         Localidad filtro = new Localidad();
-        // Nota: txtBuscarLocalidad es el campo de búsqueda, no el de edición
         if(!txtBuscarLocalidad.getText().isEmpty()) filtro.setLocalidad(txtBuscarLocalidad.getText());
 
         Municipio munFiltro = cmbBuscarMunicipioLoc.getValue();

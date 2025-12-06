@@ -4,12 +4,10 @@ public class DetalleVenta extends ElementoConID {
 
     private int cantidad;
     private double precioUnitario;
-    private double subtotal;
+    private double subtotal; // En BD se llama subtotal, en la vista a veces importe
 
-    // Relación con Libro para mostrar Título e ISBN en el reporte
+    // Relación con Libro
     private Libro libro;
-
-    // ID de la venta padre (útil a veces, aunque opcional si navegas desde Venta)
     private int idVenta;
 
     public DetalleVenta() {
@@ -17,12 +15,28 @@ public class DetalleVenta extends ElementoConID {
         this.libro = new Libro();
     }
 
-    // Getters y Setters
+    // Constructor para uso rápido en el Carrito (POS)
+    public DetalleVenta(Libro libro, int cantidad) {
+        this.libro = libro;
+        this.cantidad = cantidad;
+        this.precioUnitario = libro.getPrecio();
+        this.subtotal = this.cantidad * this.precioUnitario;
+    }
+
+    // --- GETTERS Y SETTERS ---
+
     public int getCantidad() { return cantidad; }
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+        // Recalcular subtotal automáticamente al cambiar cantidad
+        this.subtotal = this.cantidad * this.precioUnitario;
+    }
 
     public double getPrecioUnitario() { return precioUnitario; }
-    public void setPrecioUnitario(double precioUnitario) { this.precioUnitario = precioUnitario; }
+    public void setPrecioUnitario(double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+        this.subtotal = this.cantidad * this.precioUnitario;
+    }
 
     public double getSubtotal() { return subtotal; }
     public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
@@ -33,8 +47,15 @@ public class DetalleVenta extends ElementoConID {
     public int getIdVenta() { return idVenta; }
     public void setIdVenta(int idVenta) { this.idVenta = idVenta; }
 
-    // Importante para reportes rápidos
+    // --- MÉTODOS AUXILIARES PARA LA TABLA (TableView) ---
+    // La tabla busca métodos que empiecen con "get" seguidos del nombre de la columna
+
     public String getTituloLibro() {
         return (libro != null) ? libro.getTitulo() : "Desconocido";
+    }
+
+    // Alias para que la tabla encuentre "Importe" si así se configuró
+    public double getImporte() {
+        return subtotal;
     }
 }

@@ -15,6 +15,7 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setString(1, e.getNombre());
             pstmt.executeUpdate();
+            System.out.println("-> Estado insertado: " + e.getNombre());
             return e;
         } catch (SQLException ex) {
             throw new RuntimeException("Error al insertar estado: " + ex.getMessage(), ex);
@@ -42,6 +43,8 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
             if (cols > 0) sql.append(" AND estado='").append(e.getNombre()).append("'");
             else sql.append(" WHERE estado='").append(e.getNombre()).append("'");
         }
+
+        sql.append(" ORDER BY estado"); // Ordenar alfabéticamente para mejor UX
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -73,6 +76,7 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
             pstmt.setString(1, e.getNombre());
             pstmt.setInt(2, e.getId());
             pstmt.executeUpdate();
+            System.out.println("-> Estado actualizado ID: " + e.getId());
         } catch (SQLException ex) {
             throw new RuntimeException("Error actualizando estado: " + ex.getMessage(), ex);
         } finally {
@@ -89,6 +93,7 @@ public class EstadoDAOPsqlImp extends AbstractSqlDAO implements EstadoDAO {
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setInt(1, e.getId());
             pstmt.executeUpdate();
+            System.out.println("-> Estado eliminado ID: " + e.getId());
         } catch (SQLException ex) {
             throw new RuntimeException("Error borrando estado: " + ex.getMessage(), ex);
         } finally {

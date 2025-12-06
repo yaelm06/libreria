@@ -59,7 +59,7 @@
             </VBox>
 
             <HBox alignment="CENTER_LEFT">
-                <Label fx:id="lblTotal" text="Registros: 0" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-font-size: 12;"/>
+                <Label fx:id="lblTotal" text="Registros: 0" style="-fx-text-fill: #2980b9; -fx-font-size: 12; -fx-font-weight: bold;"/>
                 <VBox HBox.hgrow="ALWAYS"/>
                 <Button text="➕ Nuevo Cliente" onAction="#nuevoCliente" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
             </HBox>

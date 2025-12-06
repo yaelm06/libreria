@@ -53,7 +53,8 @@
                 </rowConstraints>
 
                 <!-- FILA 1: OPERACIONES -->
-                <Button fx:id="btnVentas" text="🛒 Punto de Venta"
+                <!-- CORRECCIÓN: Se agregó onAction="#mostrarVistaVentas" -->
+                <Button fx:id="btnVentas" text="🛒 Punto de Venta" onAction="#mostrarVistaVentas"
                         styleClass="dashboard-button"
                         GridPane.columnIndex="0" GridPane.rowIndex="0"
                         maxWidth="Infinity" maxHeight="Infinity"/>

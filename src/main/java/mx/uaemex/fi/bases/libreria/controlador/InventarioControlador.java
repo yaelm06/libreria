@@ -38,6 +38,8 @@ public class InventarioControlador {
     @FXML private HBox boxRangoAnio;
     @FXML private TextField txtBuscarAnioMin, txtBuscarAnioMax;
 
+    @FXML private Label lblTotalLibros; // NUEVO LABEL
+
     // --- LIBROS: TABLA Y FORMULARIO ---
     @FXML private TableView<Libro> tblLibros;
     @FXML private TableColumn<Libro, Integer> colLibroId, colLibroAnio;
@@ -45,7 +47,7 @@ public class InventarioControlador {
     @FXML private TableColumn<Libro, Double> colLibroPrecio;
     @FXML private TableColumn<Libro, Boolean> colLibroActivo;
 
-    @FXML private Label lblModoLibro; // NUEVO
+    @FXML private Label lblModoLibro;
     @FXML private TextField txtLibroTitulo, txtLibroISBN, txtLibroPrecio, txtLibroAnio;
     @FXML private ComboBox<Editorial> cmbLibroEditorial;
 
@@ -64,9 +66,10 @@ public class InventarioControlador {
     @FXML private TableColumn<Autor, Integer> colAutorId;
     @FXML private TableColumn<Autor, String> colAutorNombre, colAutorPaterno, colAutorMaterno;
     @FXML private TextField txtAutorNombre, txtAutorPaterno, txtAutorMaterno;
-    @FXML private Label lblModoAutor; // NUEVO
+    @FXML private Label lblModoAutor;
     @FXML private Label lblMensajeAutor;
-    @FXML private Button btnEliminarAutor; // NUEVO
+    @FXML private Button btnEliminarAutor;
+    @FXML private Label lblTotalAutores; // NUEVO LABEL
     private Autor autorSeleccionado;
 
     // --- EDITORIALES ---
@@ -75,9 +78,10 @@ public class InventarioControlador {
     @FXML private TableColumn<Editorial, Integer> colEditorialId;
     @FXML private TableColumn<Editorial, String> colEditorialNombre, colEditorialPais;
     @FXML private TextField txtEditorialNombre, txtEditorialPais;
-    @FXML private Label lblModoEditorial; // NUEVO
+    @FXML private Label lblModoEditorial;
     @FXML private Label lblMensajeEditorial;
-    @FXML private Button btnEliminarEditorial; // NUEVO
+    @FXML private Button btnEliminarEditorial;
+    @FXML private Label lblTotalEditoriales; // NUEVO LABEL
     private Editorial editorialSeleccionada;
 
     // --- DAOs ---
@@ -127,10 +131,8 @@ public class InventarioControlador {
                 txtAutorPaterno.setText(nev.getApellidoPaterno());
                 txtAutorMaterno.setText(nev.getApellidoMaterno());
                 lblMensajeAutor.setText("");
-
-                // MODO EDICIÓN
                 lblModoAutor.setText("(Editando ID: " + nev.getId() + ")");
-                lblModoAutor.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;"); // Naranja
+                lblModoAutor.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;");
                 btnEliminarAutor.setVisible(true);
             }
         });
@@ -145,10 +147,8 @@ public class InventarioControlador {
                 txtEditorialNombre.setText(nev.getEditorial());
                 txtEditorialPais.setText(nev.getPais());
                 lblMensajeEditorial.setText("");
-
-                // MODO EDICIÓN
                 lblModoEditorial.setText("(Editando ID: " + nev.getId() + ")");
-                lblModoEditorial.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;"); // Naranja
+                lblModoEditorial.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;");
                 btnEliminarEditorial.setVisible(true);
             }
         });
@@ -179,13 +179,12 @@ public class InventarioControlador {
         });
     }
 
-    // === UTILIDAD DE MENSAJES ===
     private void mostrarMensaje(Label label, String mensaje, boolean exito) {
         label.setText(mensaje);
         if (exito) {
-            label.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 13px;"); // Verde éxito
+            label.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 13px;");
         } else {
-            label.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 13px;"); // Rojo error
+            label.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 13px;");
         }
     }
 
@@ -225,7 +224,9 @@ public class InventarioControlador {
         txtBuscarPrecioExacto.clear(); txtBuscarPrecioMin.clear(); txtBuscarPrecioMax.clear();
         txtBuscarAnioExacto.clear(); txtBuscarAnioMin.clear(); txtBuscarAnioMax.clear();
 
-        tblLibros.setItems(FXCollections.observableArrayList(libroDAO.consultar()));
+        ArrayList<Libro> lista = libroDAO.consultar();
+        tblLibros.setItems(FXCollections.observableArrayList(lista));
+        lblTotalLibros.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
     }
 
     @FXML void buscarLibro(ActionEvent e) {
@@ -256,7 +257,9 @@ public class InventarioControlador {
             if(val != null) { minA = val; maxA = val; }
         }
 
-        tblLibros.setItems(FXCollections.observableArrayList(libroDAO.consultar(filtro, minP, maxP, minA, maxA, filtroAutor)));
+        ArrayList<Libro> lista = libroDAO.consultar(filtro, minP, maxP, minA, maxA, filtroAutor);
+        tblLibros.setItems(FXCollections.observableArrayList(lista));
+        lblTotalLibros.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
     }
 
     private Double parseDoubleOrNull(String txt) {
@@ -267,12 +270,11 @@ public class InventarioControlador {
     }
 
     private void cargarLibroEnFormulario(Libro l) {
-        lblMensajeLibro.setText(""); // Limpiar mensajes anteriores
+        lblMensajeLibro.setText("");
         libroSeleccionado = l;
         if (l != null) {
-            // MODO EDICIÓN
             lblModoLibro.setText("(Editando ID: " + l.getId() + ")");
-            lblModoLibro.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;"); // Naranja
+            lblModoLibro.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;");
 
             txtLibroTitulo.setText(l.getTitulo());
             txtLibroISBN.setText(l.getIsbn());
@@ -300,10 +302,8 @@ public class InventarioControlador {
 
     @FXML void nuevoLibro(ActionEvent e) {
         libroSeleccionado = null;
-
-        // MODO NUEVO
         lblModoLibro.setText("(Nuevo)");
-        lblModoLibro.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;"); // Verde
+        lblModoLibro.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
 
         txtLibroTitulo.clear(); txtLibroISBN.clear(); txtLibroPrecio.clear(); txtLibroAnio.clear();
         cmbLibroEditorial.getSelectionModel().clearSelection();
@@ -338,10 +338,8 @@ public class InventarioControlador {
                 libroDAO.actualizar(l);
             }
 
-            cargarLibros(null); // Recargar tabla
-            nuevoLibro(null);   // Limpiar formulario y poner modo nuevo
-
-            // IMPORTANTE: Mostrar mensaje DESPUÉS de limpiar (porque nuevoLibro borra el mensaje)
+            cargarLibros(null);
+            nuevoLibro(null);
             mostrarMensaje(lblMensajeLibro, esNuevo ? "Libro registrado exitosamente." : "Libro actualizado exitosamente.", true);
 
         } catch (Exception ex) {
@@ -368,6 +366,7 @@ public class InventarioControlador {
         txtBuscarAutorNombre.clear(); txtBuscarAutorPaterno.clear();
         ArrayList<Autor> autores = autorDAO.consultar();
         tblAutores.setItems(FXCollections.observableArrayList(autores));
+        lblTotalAutores.setText("Registros: " + autores.size()); // ACTUALIZAR LABEL
 
         listaAutoresFiltrada = new FilteredList<>(FXCollections.observableArrayList(autores), p -> true);
         listAutoresDisponibles.setItems(listaAutoresFiltrada);
@@ -377,15 +376,15 @@ public class InventarioControlador {
         Autor filtro = new Autor();
         if (!txtBuscarAutorNombre.getText().isEmpty()) filtro.setNombre(txtBuscarAutorNombre.getText());
         if (!txtBuscarAutorPaterno.getText().isEmpty()) filtro.setApellidoPaterno(txtBuscarAutorPaterno.getText());
-        tblAutores.setItems(FXCollections.observableArrayList(autorDAO.consultar(filtro)));
+        ArrayList<Autor> lista = autorDAO.consultar(filtro);
+        tblAutores.setItems(FXCollections.observableArrayList(lista));
+        lblTotalAutores.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
     }
 
     @FXML void nuevoAutor(ActionEvent e) {
         autorSeleccionado=null;
-
         lblModoAutor.setText("(Nuevo)");
         lblModoAutor.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-
         txtAutorNombre.clear(); txtAutorPaterno.clear(); txtAutorMaterno.clear();
         lblMensajeAutor.setText("");
         btnEliminarAutor.setVisible(false);
@@ -396,7 +395,6 @@ public class InventarioControlador {
         try {
             Autor a = (autorSeleccionado != null) ? autorSeleccionado : new Autor();
             a.setNombre(txtAutorNombre.getText()); a.setApellidoPaterno(txtAutorPaterno.getText()); a.setApellidoMaterno(txtAutorMaterno.getText());
-
             boolean esNuevo = (autorSeleccionado == null);
             if(esNuevo) autorDAO.insertar(a); else autorDAO.actualizar(a);
 
@@ -424,6 +422,7 @@ public class InventarioControlador {
         txtBuscarEdiNombre.clear(); txtBuscarEdiPais.clear();
         ArrayList<Editorial> lista = editorialDAO.consultar();
         tblEditoriales.setItems(FXCollections.observableArrayList(lista));
+        lblTotalEditoriales.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
         cmbLibroEditorial.setItems(FXCollections.observableArrayList(lista));
         cmbBuscarEditorial.setItems(FXCollections.observableArrayList(lista));
     }
@@ -432,15 +431,15 @@ public class InventarioControlador {
         Editorial filtro = new Editorial();
         if (!txtBuscarEdiNombre.getText().isEmpty()) filtro.setEditorial(txtBuscarEdiNombre.getText());
         if (!txtBuscarEdiPais.getText().isEmpty()) filtro.setPais(txtBuscarEdiPais.getText());
-        tblEditoriales.setItems(FXCollections.observableArrayList(editorialDAO.consultar(filtro)));
+        ArrayList<Editorial> lista = editorialDAO.consultar(filtro);
+        tblEditoriales.setItems(FXCollections.observableArrayList(lista));
+        lblTotalEditoriales.setText("Registros: " + lista.size()); // ACTUALIZAR LABEL
     }
 
     @FXML void nuevaEditorial(ActionEvent e) {
         editorialSeleccionada=null;
-
         lblModoEditorial.setText("(Nuevo)");
         lblModoEditorial.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-
         txtEditorialNombre.clear(); txtEditorialPais.clear();
         lblMensajeEditorial.setText("");
         btnEliminarEditorial.setVisible(false);

@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
@@ -54,13 +55,10 @@
                                 <Label text="Autor:" style="-fx-font-size: 10px;"/>
                                 <TextField fx:id="txtBuscarAutorLibro" promptText="Buscar por autor..." prefWidth="150"/>
                             </VBox>
-
-                            <!-- CORRECCIÓN: SE AGREGÓ DE VUELTA EL CAMPO ISBN -->
                             <VBox spacing="2">
                                 <Label text="ISBN:" style="-fx-font-size: 10px;"/>
                                 <TextField fx:id="txtBuscarISBN" promptText="ISBN..." prefWidth="120"/>
                             </VBox>
-
                             <VBox spacing="2">
                                 <Label text="Editorial:" style="-fx-font-size: 10px;"/>
                                 <ComboBox fx:id="cmbBuscarEditorial" promptText="Todas" prefWidth="150"/>
@@ -75,7 +73,8 @@
                             <HBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 5; -fx-background-radius: 3;">
                                 <CheckBox fx:id="chkRangoPrecio" text="Precio" onAction="#toggleRangoPrecio"/>
                                 <StackPane alignment="CENTER_LEFT">
-                                    <TextField fx:id="txtBuscarPrecioExacto" promptText="'$ Exacto" prefWidth="70"/>
+                                    <!-- CORREGIDO: promptText sin el símbolo $ al inicio -->
+                                    <TextField fx:id="txtBuscarPrecioExacto" promptText="Exacto ($)" prefWidth="70"/>
                                     <HBox fx:id="boxRangoPrecio" spacing="2" visible="false">
                                         <TextField fx:id="txtBuscarPrecioMin" promptText="Min" prefWidth="50"/>
                                         <Label text="-"/>
@@ -97,7 +96,8 @@
                                 </StackPane>
                             </HBox>
 
-                            <VBox HBox.hgrow="ALWAYS"/>
+                            <Region HBox.hgrow="ALWAYS"/> <!-- Ahora sí funcionará porque importamos Region -->
+                            <Label fx:id="lblTotalLibros" text="Registros: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9; -fx-padding: 5 10 0 0;"/>
                             <Button text="LIMPIAR" onAction="#cargarLibros" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px;"/>
                             <Button text="🔍 BUSCAR" onAction="#buscarLibro" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold;"/>
                         </HBox>
@@ -126,15 +126,12 @@
                 </VBox>
 
                 <!-- DERECHA: FORMULARIO LIBROS -->
-                <VBox spacing="10" prefWidth="320" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
-                    <!-- TITULO DINÁMICO -->
+                <VBox spacing="10" prefWidth="300" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
                     <HBox spacing="5" alignment="CENTER_LEFT">
                         <Label text="Detalles" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #2c3e50;"/>
                         <Label fx:id="lblModoLibro" text="(Nuevo)" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #27ae60;"/>
                     </HBox>
                     <Separator/>
-
-                    <!-- MENSAJE DE ESTADO (Visible arriba para que no se pierda) -->
                     <Label fx:id="lblMensajeLibro" wrapText="true" minHeight="20" style="-fx-font-size: 12px;"/>
 
                     <Label text="Título:"/>
@@ -176,11 +173,8 @@
 
                     <CheckBox fx:id="chkLibroActivo" text="Disponible (Activo)" selected="true"/>
 
-                    <!-- BOTONES DE ACCIÓN (INFERIORES) -->
                     <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-                        <!-- El botón Nuevo también está arriba, pero lo dejamos aquí como 'Limpiar' si se prefiere -->
                         <Button text="Limpiar" onAction="#nuevoLibro" style="-fx-background-color: #ecf0f1;"/>
-
                         <Button text="Guardar Datos" onAction="#guardarLibro" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"/>
                     </HBox>
                     <Button fx:id="btnEliminarLibro" text="Eliminar / Dar de baja" onAction="#eliminarLibro" visible="false" maxWidth="Infinity" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
@@ -198,6 +192,8 @@
                         <TextField fx:id="txtBuscarAutorPaterno" promptText="A. Paterno..." />
                         <Button text="🔍 Buscar" onAction="#buscarAutor" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
                         <Button text="Todos" onAction="#recargarAutores"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotalAutores" text="Registros: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
                     </HBox>
                     <HBox alignment="CENTER_RIGHT">
                         <Button text="+ Nuevo Autor" onAction="#nuevoAutor" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
@@ -242,6 +238,8 @@
                         <TextField fx:id="txtBuscarEdiPais" promptText="País..." />
                         <Button text="🔍 Buscar" onAction="#buscarEditorial" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
                         <Button text="Todos" onAction="#recargarEditoriales"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotalEditoriales" text="Registros: 0" style="-fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
                     </HBox>
                     <HBox alignment="CENTER_RIGHT">
                         <Button text="+ Nueva Editorial" onAction="#nuevaEditorial" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>

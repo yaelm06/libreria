@@ -16,11 +16,17 @@
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.uaemex.fi.bases.libreria.controlador.UbicacionesControlador"
-      spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+      spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;" prefHeight="700" prefWidth="1000">
 
-    <Label text="Gestión de Ubicaciones">
-        <font><Font name="Segoe UI Bold" size="24.0"/></font>
-    </Label>
+    <!-- ENCABEZADO CON BOTÓN REGRESAR -->
+    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);">
+        <Button text="⬅ Regresar al Menú" onAction="#regresarMenu"
+                style="-fx-background-color: transparent; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #bdc3c7; -fx-border-radius: 3;"/>
+        <Separator orientation="VERTICAL" />
+        <Label text="Gestión de Ubicaciones" style="-fx-text-fill: #2c3e50;">
+            <font><Font name="Segoe UI Bold" size="24.0"/></font>
+        </Label>
+    </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 

@@ -25,6 +25,7 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
             }
 
             pstmt.executeUpdate();
+            System.out.println("-> Localidad registrada con éxito: " + l.getLocalidad());
             return l;
         } catch (SQLException ex) {
             throw new RuntimeException("Error insertando localidad: " + ex.getMessage(), ex);
@@ -35,7 +36,6 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
 
     @Override
     public ArrayList<Localidad> consultar() {
-        // Consultar TODAS (sin filtros)
         return consultar(new Localidad());
     }
 
@@ -45,37 +45,25 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
         StringBuilder sql = new StringBuilder("SELECT * FROM ubicaciones.vista_localidades_completas");
         int cols = 0;
 
-        // --- Construcción de Filtros ---
-
-        // 1. Filtro por ID
         if (l.getId() > 0) {
             sql.append(" WHERE id_localidad=").append(l.getId());
             cols++;
         }
-
-        // 2. Filtro por Nombre Localidad (si escribieron algo)
         if (l.getLocalidad() != null && !l.getLocalidad().isEmpty()) {
             if (cols > 0) sql.append(" AND localidad LIKE '%").append(l.getLocalidad()).append("%'");
             else sql.append(" WHERE localidad LIKE '%").append(l.getLocalidad()).append("%'");
             cols++;
         }
-
-        // 3. Filtro por CP
         if (l.getCodigoPostal() != null && !l.getCodigoPostal().isEmpty()) {
             if (cols > 0) sql.append(" AND codigo_postal LIKE '%").append(l.getCodigoPostal()).append("%'");
             else sql.append(" WHERE codigo_postal LIKE '%").append(l.getCodigoPostal()).append("%'");
             cols++;
         }
-
-        // 4. Filtro por Municipio (usando el nombre que viene en la vista)
         if (l.getMunicipio() != null && l.getMunicipio().getNombre() != null && !l.getMunicipio().getNombre().isEmpty()) {
             if (cols > 0) sql.append(" AND municipio='").append(l.getMunicipio().getNombre()).append("'");
             else sql.append(" WHERE municipio='").append(l.getMunicipio().getNombre()).append("'");
             cols++;
         }
-
-        // 5. Filtro por Estado (usando el nombre que viene en la vista)
-        // Este era el que fallaba antes si no ponías nombre de localidad. Ahora debería funcionar.
         if (l.getEstado() != null && l.getEstado().getNombre() != null && !l.getEstado().getNombre().isEmpty()) {
             if (cols > 0) sql.append(" AND estado='").append(l.getEstado().getNombre()).append("'");
             else sql.append(" WHERE estado='").append(l.getEstado().getNombre()).append("'");
@@ -95,13 +83,14 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
                 loc.setLocalidad(rs.getString("localidad"));
                 loc.setCodigoPostal(rs.getString("codigo_postal"));
 
-                // Llenamos el objeto Municipio
+                // --- CORRECCIÓN IMPORTANTE: LEER LOS IDs ---
                 Municipio mun = new Municipio();
+                mun.setId(rs.getInt("id_municipio")); // ¡Esto faltaba!
                 mun.setNombre(rs.getString("municipio"));
                 loc.setMunicipio(mun);
 
-                // Llenamos el objeto Estado
                 Estado est = new Estado();
+                est.setId(rs.getInt("id_estado"));    // ¡Esto faltaba!
                 est.setNombre(rs.getString("estado"));
                 loc.setEstado(est);
 
@@ -127,6 +116,7 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
             pstmt.setInt(3, l.getMunicipio().getId());
             pstmt.setInt(4, l.getId());
             pstmt.executeUpdate();
+            System.out.println("-> Localidad actualizada correctamente ID: " + l.getId());
         } catch (SQLException ex) {
             throw new RuntimeException("Error actualizando localidad: " + ex.getMessage(), ex);
         } finally {
@@ -143,6 +133,7 @@ public class LocalidadDAOPsqlImp extends AbstractSqlDAO implements LocalidadDAO 
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setInt(1, l.getId());
             pstmt.executeUpdate();
+            System.out.println("-> Localidad eliminada correctamente ID: " + l.getId());
         } catch (SQLException ex) {
             throw new RuntimeException("Error borrando localidad: " + ex.getMessage(), ex);
         } finally {

@@ -46,29 +46,30 @@ public class MenuPrincipalControlador {
         }
     }
 
-    // --- MÉTODO CORREGIDO: Abre ventana independiente ---
+    // --- ACCIÓN BOTÓN VENTAS ---
+    @FXML
+    void mostrarVistaVentas(ActionEvent event) {
+        // Asegúrate de que el FXML VentasVista.fxml esté en esta ruta
+        abrirVentana("/mx/uaemex/fi/bases/libreria/VentasVista.fxml", "Punto de Venta");
+    }
+
     @FXML
     void mostrarVistaEmpleados(ActionEvent event) {
-        // Ruta absoluta correcta
         abrirVentana("/mx/uaemex/fi/bases/libreria/EmpleadosVista.fxml", "Gestión de Empleados");
     }
 
-    // --- MÉTODO CORREGIDO: Abre ventana independiente ---
     @FXML
     void mostrarVistaUbicaciones(ActionEvent event) {
-        // Ruta absoluta correcta
         abrirVentana("/mx/uaemex/fi/bases/libreria/UbicacionesVista.fxml", "Gestión de Ubicaciones");
     }
 
     @FXML
     void mostrarVistaClientes(ActionEvent event) {
-        // Ruta: /mx/uaemex/fi/bases/libreria/ClientesVista.fxml
         abrirVentana("/mx/uaemex/fi/bases/libreria/ClientesVista.fxml", "Gestión de Clientes");
     }
 
     @FXML
     void mostrarVistaInventario(ActionEvent event) {
-        // Ruta: /mx/uaemex/fi/bases/libreria/ClientesVista.fxml
         abrirVentana("/mx/uaemex/fi/bases/libreria/InventarioVista.fxml", "Gestión de Inventario");
     }
 
@@ -80,16 +81,18 @@ public class MenuPrincipalControlador {
             Object controller = loader.getController();
             Connection connSql = this.con.obtenerConexion();
 
+            // Inyección de dependencias según el controlador
             if (controller instanceof EmpleadosControlador) {
                 ((EmpleadosControlador) controller).setConexionBD(this.con, connSql);
             } else if (controller instanceof UbicacionesControlador) {
                 ((UbicacionesControlador) controller).setConexionBD(this.con, connSql);
             } else if (controller instanceof ClientesControlador) {
-                // Inyectar conexión al controlador de clientes
                 ((ClientesControlador) controller).setConexionBD(this.con, connSql);
-            }else if (controller instanceof InventarioControlador) {
-                // Inyectar conexión al controlador de inventario
+            } else if (controller instanceof InventarioControlador) {
                 ((InventarioControlador) controller).setConexionBD(this.con, connSql);
+            } else if (controller instanceof VentasControlador) {
+                // CASO ESPECIAL: Ventas necesita el empleado logueado para registrar la venta
+                ((VentasControlador) controller).initData(this.con, connSql, this.empleadoLogueado);
             }
 
             Stage stage = new Stage();
